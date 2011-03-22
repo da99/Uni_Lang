@@ -71,22 +71,30 @@ end # === class
 
 class Noun
   
-  attr_reader name
+  attr_reader :name, :propertys, :ancestors
   
   def initialize name, props = {}, actions = []
     @name         = name
     @props        = props
     @actions      = actions
-    @noun_classes = []
+    @ancestors = []
     
     @modules = []
     @icrud = {}
+    @propertys = {}
   end
 
-  def set_prop name, val
+  def has? name
+    propertys.has_key?(name)
   end
 
-  def get_prop name, val
+  def set name, val
+    propertys[name] = val
+  end
+
+  def get name
+    raise "Unknown property: #{name.inspect}" unless has?(name)
+    propertys[name]
   end
 
   def on_initialize
@@ -114,16 +122,17 @@ class Sentence
   Done_Line = "! Done :)"
   No_Match = Class.new(RuntimeError)
   
-  attr_reader :name, :code, :pattern, :pattern_regexp,
+  attr_reader :name, :code, :action, :pattern, :pattern_regexp,
     :args, :args_ordered, :replace_pattern, :replace_pattern_regexp, :is_partial
 
-  def initialize name, code
+  def initialize name, code, action = :default
     # === PATTERNS
     space = '\\ {0,}'
     word  = "[^\ ]+"
     arg_pattern = %r!\[#{space}([^\ ]+)#{space}([^\ ]+)?#{space}\]!
     split_pattern = %r!\[#{space}[^\ ]+#{space}[^\ ]{0,}#{space}\]!
     
+    @action = action
     @is_partial = false
     @name = name
     @code = code
@@ -160,6 +169,10 @@ class Sentence
     end
   end
   
+  def default_action?
+    @action === :default
+  end 
+  
   def match_line index, program
     
     line = program.lines[index]
@@ -182,9 +195,30 @@ class Sentence
 
     line.sentences << self
     line.updates << line.code.gsub(replace_pattern_regexp, Done_Line)
-    line.args << args_with_vals
+    args_with_vals.each { |hash|
+      line.args.merge! hash
+    }
     
     line
+  end
+
+  def compile line
+    if default_action?
+      puts "Line: #{line.number} ->  #{name}"
+      case name
+        when "noun-create"
+          noun = Noun.new(line.args.index('Word'))
+          noun.ancestors << line.args.index('Noun')
+          line.program << noun
+          pp line.args 
+        when "noun-set-property"
+          pp line.args
+      end
+      puts ''
+      return 
+    end
+
+    raise "Not done: custom actions."
   end
 
 end # === class
@@ -317,10 +351,8 @@ class Program
       line  = @lines[index]
       
       unless line.ignore?
-        @sentences.each { |sentence|
-          sentence.match_line( index, this )
-          break if line.full_match?
-        }
+        
+        line.match
         
         if line.partial_match?
           raise "Did not completely match: #{line.number}: #{line.code}"
@@ -331,6 +363,8 @@ class Program
         end
       end
         
+      line.compile
+
       index += line.skip
       
     end
@@ -429,7 +463,7 @@ class Code_Array_To_Lines
       program.lines.each_index { |index|
         line = lines[index]
         new = if line.is_a?(String)
-                Line.new index, line
+                Line.new index, line, program
               else
                 line
               end
@@ -461,18 +495,36 @@ end # === class Code_To_Sub_Program
 
 class Line 
   
-  attr_reader :number, :code, :sentences, :args
+  attr_reader :number, :index, :code, :program, :sentences, :args
   attr_reader :updates, :skip
   
-  def initialize raw_index, code
+  def initialize raw_index, code, program
     @number    = raw_index + 1
     @index     = raw_index
     @code      = code
     @ignore    = false
+    @program   = program
     @sentences = []
     @updates   = []
-    @args      = []
+    @args      = {}
     @skip      = 1
+  end
+
+  def match
+    return if ignore?
+    return if not sentences.empty?
+
+    program.sentences.each { |sentence|
+      sentence.match_line( index, program )
+      break if full_match?
+    }
+    
+    not sentences.empty?
+  end
+
+  def compile
+    return if ignore?
+    sentences.last.compile self
   end
 
   def empty?
@@ -510,8 +562,8 @@ program = Program.new(PROGRAM) {
   name 'main' 
 }
 
-program << Sentence.new('new-noun', "[Word] is a [Noun].")
-program << Sentence.new('set-property', "The [Word Prop] of [Noun] is [Word Val].")
+program << Sentence.new('noun-create', "[Word] is a [Noun].")
+program << Sentence.new('noun-set-property', "The [Word Prop] of [Noun] is [Word Val].")
 
 program << Noun.new('Noun',   { :data_type=>'true'}, [:exist])
 program << Noun.new('Word',   { :data_type=>'true'}, [:anything])
@@ -528,7 +580,9 @@ program << Code_To_Sub_Program
 
 program.compile
 
-pp program.lines
+pp program.nouns
+
+# pp program.lines
 
 # program.run
 # 
@@ -537,116 +591,4 @@ pp program.lines
 
 
 __END__
-
-
-Nouns << Noun.new('Superhero', :"real-name" => nil, :"real-job" => nil)
-
-
-
-class Sentence_Match
-  
-  No_Match = Class.new(RuntimeError)
-  Done_Line = "! Done :)"
-  attr_reader :line, :sentence, :args
-
-  def initialize line, sentence
-    @line         = line
-    @sentence     = sentence
-    @updated_line = nil
-    
-    args = @line.scan(Regexp.new(sentence.pattern))
-
-    if args.empty?
-      raise No_Match, "#{@line} |->| #{sentence.code}"
-    end
-    
-    args_with_vals = []
-
-    args.each { |each_match|
-      pairs = each_match.zip(sentence.args_ordered)
-      args_with_vals << pairs.inject({}) { |memo, pair|
-        memo[pair[0]] = pair[1][0]
-        memo
-      }
-    }
-
-    @updated_line = @line.gsub(Regexp.new(sentence.replace_pattern), Done_Line)
-    @args = args_with_vals
-  end
-  
-  def updated_line
-    raise "No updated line set." unless @updated_line
-    @updated_line
-  end
-  
-  def all?
-    @updated_line == Done_Line
-  end
-
-end # === class
-
-
-class Stack_Loop_Result
-  
-  include Askable
-  
-  attr_reader :core, :ancestor
-
-  def initialize core, ancestor
-    @core = core
-    @ancestor = ancestor
-  end
-  
-end # === class Stack_Loop_Result
-
-
-
-
-class Stack_Loop
-  
-  attr_reader :results, :stack
-
-  def initialize stack
-    @stack   = []
-    @copy    = @stack.clone
-    @results = Stack.new
-  end
-
-  def start
-    this = self
-    @copy.each { |item|
-      yield Stack_Loop_Item.new(item)
-    }
-  end
-
-end # === class Stack_Loop
-
-class Stack_Loop_Step
-  
-  attr_reader :core, :stack_loop, :index
-
-  def initialize core, stack_loop, index
-    @core       = core
-    @stack_loop = origin
-    @index      = index
-  end
-  
-  def << val
-    stack_loop.results Stack_Loop_Step.new( val, self )
-    val
-  end
-
-end # === class Stack_Loop_Step
-
-class Stack_Loop_Result
-  
-  attr_reader :core, :parent
-
-  def initialize core, parent
-    @core = core
-    @parent = parent
-  end
-
-end # === class Stack_Loop_Result
-
 
