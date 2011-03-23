@@ -3,18 +3,15 @@ require 'jcode'
 require 'yaml'
 require 'pp'
 
-# Doc (aka applet, object, Oberon module, etc.)
-#   - Nouns
-#   - Verbs
-#   - Documents
-#   - Meta
-#     - address
-#     - filename
-#     - author
-#
+# Program (aka applet, doc, document, object, Oberon module, etc.)
+#   - author
+# Line
+#   - address
+#   - filename
+# Sentence
 # Noun
-# Verb
-#
+# Parser
+
 
 PROGRAM  = %~
 
@@ -66,58 +63,7 @@ module Askable
 end # === module Askable
 
 
-class Document
-end # === class
-
-class Noun
-  
-  attr_reader :name, :propertys, :ancestors
-  
-  def initialize name, props = {}, actions = []
-    @name         = name
-    @props        = props
-    @actions      = actions
-    @ancestors = []
-    
-    @modules = []
-    @icrud = {}
-    @propertys = {}
-  end
-
-  def has? name
-    propertys.has_key?(name)
-  end
-
-  def set name, val
-    propertys[name] = val
-  end
-
-  def get name
-    raise "Unknown property: #{name.inspect}" unless has?(name)
-    propertys[name]
-  end
-
-  def on_initialize
-  end
-
-  def on_create
-  end
-
-  def on_read
-  end
-
-  def on_update
-  end
-
-  def on_delete
-  end
-
-  def on_undelete
-  end
-
-end # === class
-
-class Sentence
+module Sentence
   
   Done_Line = "! Done :)"
   No_Match = Class.new(RuntimeError)
@@ -169,6 +115,10 @@ class Sentence
     end
   end
   
+  def plugin_type
+    :sentence
+  end
+  
   def default_action?
     @action === :default
   end 
@@ -202,26 +152,7 @@ class Sentence
     line
   end
 
-  def compile line
-    if default_action?
-      puts "Line: #{line.number} ->  #{name}"
-      case name
-        when "noun-create"
-          noun = Noun.new(line.args.index('Word'))
-          noun.ancestors << line.args.index('Noun')
-          line.program << noun
-          pp line.args 
-        when "noun-set-property"
-          pp line.args
-      end
-      puts ''
-      return 
-    end
-
-    raise "Not done: custom actions."
-  end
-
-end # === class
+end # === module Sentence
 
 class Stack
   
@@ -335,7 +266,7 @@ class Program
     raise "No parses specified." if parsers.empty?
     this = self
     parsers.each { |parser_plugin|
-      @lines = parser_plugin.parse(this)
+      @lines = parser_plugin.new(this).parse
     }
   end
 
@@ -373,24 +304,28 @@ class Program
   end
 
   def << obj
-    
-    case obj
-    when Sentence
-      sentences << obj
-    when Noun
-      nouns << obj
-    else
-      if obj.respond_to?(:plugin_type)
-        case obj.plugin_type
-        when :parser
-          parsers << obj
-        else
-          raise "Unknown Plugin Type: #{obj.inspect}"
-        end
-      else
-        raise "Unknown object: #{obj.inspect}"
-      end
+   
+    if obj.respond_to?(:ancestors)
+      target = ( [ Noun, Sentence, Parser ] & obj.ancestors ).first
     end
+    
+    if not target 
+      target = obj
+    else
+      target = target.to_s
+    end
+    
+    case target
+    when Noun.to_s, Noun
+      nouns.unshift obj
+    when Sentence.to_s, Sentence
+      sentences << obj
+    when Parser.to_s, Parser
+      parsers << obj
+    else
+      raise "Unknown Plugin Type: #{obj.inspect}"
+    end
+
   end
 
   def run raw_program
@@ -408,88 +343,78 @@ class Program
   
 end # === class
 
+module Parser
+  
+  attr_reader :program
+  
+  def initialize program
+    @program = program
+  end
+
+  def plugin_type
+    :parser
+  end
+
+end # === module Parser
+
 class Code_To_Array
   
-  class << self
+  include Parser
+  
+  def parse
+    lines = program.lines
+    return lines if lines.is_a?(Array)
 
-    def plugin_type
-      :parser
-    end
-
-    def parse program
-      lines = program.lines
-      return lines if lines.is_a?(Array)
-      
-      program.code.split("\n")
-    end
-    
-  end # === class << self
+    program.code.split("\n")
+  end
 
 end # === Code_To_Array
 
 class Code_Ignore_Empty_Lines
   
-  class << self
-    
-    def plugin_type
-      :parser
-    end
+  include Parser
 
-    def parse program
-      program.lines.each { |line|
-        if line.empty?
-          line.ignore_this
-        end
-      }
-      
-      program.lines
-    end
+  def parse
+    program.lines.each { |line|
+      if line.empty?
+        line.ignore_this
+      end
+    }
 
-  end # === class << self
+    program.lines
+  end
 
 end # === class Code_Ignore_Empty_Lines
 
 class Code_Array_To_Lines
   
-  class << self
-    
-    def plugin_type
-      :parser
-    end
+  include Parser
 
-    def parse program
-      lines = program.lines
-      new_lines  = []
-      program.lines.each_index { |index|
-        line = lines[index]
-        new = if line.is_a?(String)
-                Line.new index, line, program
-              else
-                line
-              end
-        new_lines << new
-      }
-      
-      new_lines
-    end
+  def parse
+    lines = program.lines
+    new_lines  = []
+    program.lines.each_index { |index|
+      line = lines[index]
+      new = if line.is_a?(String)
+              Line.new index, line, program
+            else
+              line
+            end
+      new_lines << new
+    }
 
-  end # === class << self
+    new_lines
+  end
 
 end # === Code_Array_To_Lines
  
 class Code_To_Sub_Program
   
-  class << self
-    
-    def plugin_type
-      :parser
-    end
-    
-    def parse program
-      program.lines
-    end
-
-  end # === class << self
+  include Parser
+  
+  def parse
+    program.lines
+  end
 
 end # === class Code_To_Sub_Program
 
@@ -515,7 +440,7 @@ class Line
     return if not sentences.empty?
 
     program.sentences.each { |sentence|
-      sentence.match_line( index, program )
+      sentence.new.match_line( index, program )
       break if full_match?
     }
     
@@ -557,17 +482,134 @@ class Line
 
 end # === class Line
 
+class Noun_Create
+  
+  include Sentence
+
+  def initialize
+    super 'noun-create', "[Word] is a [Noun]."
+  end
+
+  def compile line
+    name     = line.args.index('Word')
+    ancestor = line.args.index('Noun')
+    
+    noun = Noun_By_User.new( name )
+    noun.ancestors << ancestor
+    line.program << noun
+    pp line.args 
+    puts ''
+  end
+
+end # === class Noun_Create
+
+class Noun_Set_Property
+  
+  include Sentence
+
+  def initialize
+    super 'noun-set-property', "The [Word Prop] of [Noun] is [Word Val]."
+  end
+
+  def compile line
+    pp line.args
+    puts ''
+  end
+
+end # === class Noun_Set_Property
+
+module Noun
+  
+  attr_reader :name, :propertys, :ancestors
+  
+  def initialize name, props = {}, actions = []
+    @name         = name
+    @props        = props
+    @actions      = actions
+    @ancestors = []
+    
+    @modules = []
+    @icrud = {}
+    @propertys = {}
+  end
+
+  def data_type?
+    false
+  end
+  
+  def valid? str, program
+    program.nouns.detect { |noun|
+      noun.name == str && noun.ancestors.include?(name)
+    }
+  end
+  
+  def plugin_type
+    :noun
+  end
+
+  def has? name
+    propertys.has_key?(name)
+  end
+
+  def set name, val
+    propertys[name] = val
+  end
+
+  def get name
+    raise "Unknown property: #{name.inspect}" unless has?(name)
+    propertys[name]
+  end
+
+  def on_initialize
+  end
+
+  def on_create
+  end
+
+  def on_read
+  end
+
+  def on_update
+  end
+
+  def on_delete
+  end
+
+  def on_undelete
+  end
+
+end # === module Noun
+
+class Noun_Number
+
+  include Noun
+  
+  def data_type?
+    true
+  end
+  
+  def valid? str, program
+    pos = ( str =~ /\d+(\.\d+)?/ )
+    return false if pos == nil
+    true
+  end
+
+end # === class Noun_Word
+
+class Noun_By_User
+  
+  include Noun
+
+end # === class Noun_By_User
 
 program = Program.new(PROGRAM) {
   name 'main' 
 }
 
-program << Sentence.new('noun-create', "[Word] is a [Noun].")
-program << Sentence.new('noun-set-property', "The [Word Prop] of [Noun] is [Word Val].")
+program << Noun_Create
+program << Noun_Set_Property
 
-program << Noun.new('Noun',   { :data_type=>'true'}, [:exist])
-program << Noun.new('Word',   { :data_type=>'true'}, [:anything])
-program << Noun.new('Number', { :data_type=>'true'}, [:number])
+program << Noun_Number
 
 program << Code_To_Array
 program << Code_Array_To_Lines
@@ -591,4 +633,9 @@ pp program.nouns
 
 
 __END__
+
+
+
+
+
 
