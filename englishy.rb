@@ -19,7 +19,7 @@ Superhero is a Noun.
 Rocket-Man is a Superhero.
 The real-name of Rocket-Man is Bob.
 The real-job of Rocket-Man is marriage-counselor.
-
+The real-home of Rocket-Man is Boise,ID.
 ~
 
 BASE_ACTIONS = %~
@@ -504,7 +504,13 @@ class Noun_Set_Property
   end
 
   def compile line
-    pp line.args
+    prop = line.args.index('Prop')
+    val  = line.args.index('Val')
+    noun = line.program.nouns.detect { |n| n.name == line.args.index('Noun') }
+    
+    noun.set prop, val
+    
+    puts "#{prop} of #{noun.name} has been set to #{val}"
     puts ''
   end
 
