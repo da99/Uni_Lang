@@ -115,10 +115,6 @@ module Sentence
     end
   end
   
-  def plugin_type
-    :sentence
-  end
-  
   def default_action?
     @action === :default
   end 
@@ -351,10 +347,6 @@ module Parser
     @program = program
   end
 
-  def plugin_type
-    :parser
-  end
-
 end # === module Parser
 
 class Code_To_Array
@@ -543,10 +535,6 @@ module Noun
     }
   end
   
-  def plugin_type
-    :noun
-  end
-
   def has? name
     propertys.has_key?(name)
   end
