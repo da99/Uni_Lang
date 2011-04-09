@@ -13,36 +13,54 @@ require 'pp'
 #   Noun
 #   Parser
 
-# Classes
-%w{ Program Line }.each { |name|
+# == Classes 
+%w{ 
+  
+  Program 
+  Parser 
+  Sentence 
+  Noun 
+  Line 
+  
+}.each { |name|
   require "class/#{name}"
 }
 
-# Modules
-%w{ Parser Sentence Noun }.each { |name|
-  require "module/#{name}"
-}
-
-
-# Parser Plugins
+# == Parser Plugins
 %w{ 
+
   Code_Array_To_Lines
   Code_Ignore_Empty_Lines
   Code_To_Array
   Code_To_Sub_Program
+
 }.each { |name|
-  require "plugin/parser/#{name}"
+  require "class/Parser/#{name}"
 }
 
-# Noun Plugins
-%w{ 
+# == Sentence Plugins
+
+%w{
+
   Noun_Create
   Noun_Set_Property
+
+}.each { |name|
+  require "class/Sentence/#{name}"
+}
+
+
+# == Noun Plugins
+%w{ 
+
   Noun_Number
   Noun_By_User
+
 }.each { |name|
-  require "plugin/noun/#{name}"
+  require "class/Noun/#{name}"
 }
+
+# ========================================================
 
 PROGRAM  = %~
 

@@ -2,7 +2,7 @@
 
 class Noun_Set_Property
   
-  include Sentence
+  include Sentence::Module
 
   def initialize
     super 'noun-set-property', "The [Word Prop] of [Noun] is [Word Val]."

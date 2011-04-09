@@ -2,7 +2,7 @@
 
 class Code_Ignore_Empty_Lines
   
-  include Parser
+  include Parser::Module
 
   def parse
     program.lines.each { |line|

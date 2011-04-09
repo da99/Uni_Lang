@@ -2,7 +2,7 @@
 
 class Noun_Create
   
-  include Sentence
+  include Sentence::Module
 
   def initialize
     super 'noun-create', "[Word] is a [Noun]."

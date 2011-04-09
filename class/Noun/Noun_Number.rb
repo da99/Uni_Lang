@@ -2,7 +2,7 @@
 
 class Noun_Number
 
-  include Noun
+  include Noun::Module
   
   def data_type?
     true

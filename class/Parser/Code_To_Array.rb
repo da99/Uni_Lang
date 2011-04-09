@@ -2,7 +2,7 @@
 
 class Code_To_Array
   
-  include Parser
+  include Parser::Module
   
   def parse
     lines = program.lines

@@ -2,6 +2,8 @@
 
 class Stack
   
+  module Module
+
   attr_reader :stack, :parent
 
   def initialize parent
@@ -21,5 +23,8 @@ class Stack
   def to_a
     @stack
   end
+  
+  end # === module
 
+  include Module
 end # === class Stack

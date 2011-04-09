@@ -2,7 +2,7 @@
  
 class Code_To_Sub_Program
   
-  include Parser
+  include Parser::Module
   
   def parse
     program.lines

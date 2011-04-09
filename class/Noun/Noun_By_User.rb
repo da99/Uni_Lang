@@ -2,6 +2,6 @@
 
 class Noun_By_User
   
-  include Noun
+  include Noun::Module
 
 end # === class Noun_By_User
