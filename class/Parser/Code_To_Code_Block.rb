@@ -1,6 +1,6 @@
 
  
-class Code_To_Sub_Program
+class Code_To_Code_Block
   
   include Parser::Module
   
@@ -8,4 +8,4 @@ class Code_To_Sub_Program
     program.lines
   end
 
-end # === class Code_To_Sub_Program
+end # === class Code_To_Code_Block

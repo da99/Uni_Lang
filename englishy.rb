@@ -3,7 +3,7 @@ require 'jcode'
 require 'yaml'
 require 'pp'
 
-# Program (aka applet, doc, document, object, Oberon module, etc.)
+# Document (aka applet, doc, document, object, Oberon module, etc.)
 #   - author
 # Line
 #   - address
@@ -16,7 +16,7 @@ require 'pp'
 # == Classes 
 %w{ 
   
-  Program 
+  Document 
   Parser 
   Sentence 
   Noun 
@@ -32,7 +32,7 @@ require 'pp'
   Code_Array_To_Lines
   Code_Ignore_Empty_Lines
   Code_To_Array
-  Code_To_Sub_Program
+  Code_To_Code_Block
 
 }.each { |name|
   require "class/Parser/#{name}"
@@ -69,6 +69,7 @@ Rocket-Man is a Superhero.
 The real-name of Rocket-Man is Bob.
 The real-job of Rocket-Man is marriage-counselor.
 The real-home of Rocket-Man is Boise,ID.
+
 ~
 
 BASE_ACTIONS = %~
@@ -78,9 +79,10 @@ BASE_ACTIONS = %~
   unless
     ensure
   +, -, *, /, etc.
+
 ~
 
-program = Program.new(PROGRAM) {
+program = Document.new(PROGRAM) {
   name 'main' 
 }
 
@@ -92,7 +94,7 @@ program << Noun_Number
 program << Code_To_Array
 program << Code_Array_To_Lines
 program << Code_Ignore_Empty_Lines
-program << Code_To_Sub_Program
+program << Code_To_Code_Block
  
 
 # require 'rubygems'; require 'ruby-debug'; debugger

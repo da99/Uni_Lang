@@ -1,6 +1,6 @@
 
 
-class Program
+class Document
 
   GET_VAL = :_get_
 
@@ -27,6 +27,7 @@ class Program
 
     def initialize str, &blok
       @code = str
+      @code_block = Code_Block.new( self )
       @lines                = @code
       @backtrace            = []
 
@@ -66,7 +67,7 @@ class Program
     def import new_name, new_file_address, new_program
       this = self
 
-      new_import = Program.new(new_program) {
+      new_import = Document.new(new_program) {
         name new_name
         file_address new_file_address
         importer this
@@ -152,11 +153,11 @@ class Program
       @indent = @indent + 1
       program = case program
                 when String
-                  Program.new(program)
-                when Program
+                  Document.new(program)
+                when Document
                   raw_program
                 else
-                  raise "Unknown program: #{raw_program.inspect}"
+                  raise "Unknown document class: #{raw_program.inspect}"
                 end
       @indent = @indent - 1
     end
