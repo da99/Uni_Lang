@@ -7,7 +7,7 @@ class Code_Block
       
       case parent
         
-      when Document
+      when Page
         @code = parent.code
         
       when Sentence

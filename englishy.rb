@@ -3,7 +3,7 @@ require 'jcode'
 require 'yaml'
 require 'pp'
 
-# Document (aka applet, doc, document, object, Oberon module, etc.)
+# Page (aka applet, doc, document, object, Oberon module, etc.)
 #   - author
 # Line
 #   - address
@@ -16,7 +16,7 @@ require 'pp'
 # == Classes 
 %w{ 
   
-  Document 
+  Page 
   Parser 
   Sentence 
   Noun 
@@ -82,7 +82,7 @@ BASE_ACTIONS = %~
 
 ~
 
-program = Document.new(PROGRAM) {
+program = Page.new(PROGRAM) {
   name 'main' 
 }
 

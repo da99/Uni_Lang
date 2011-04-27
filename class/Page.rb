@@ -1,6 +1,6 @@
 
 
-class Document
+class Page
 
   GET_VAL = :_get_
 
@@ -67,7 +67,7 @@ class Document
     def import new_name, new_file_address, new_program
       this = self
 
-      new_import = Document.new(new_program) {
+      new_import = Page.new(new_program) {
         name new_name
         file_address new_file_address
         importer this
@@ -153,11 +153,11 @@ class Document
       @indent = @indent + 1
       program = case program
                 when String
-                  Document.new(program)
-                when Document
+                  Page.new(program)
+                when Page
                   raw_program
                 else
-                  raise "Unknown document class: #{raw_program.inspect}"
+                  raise "Unknown page class: #{raw_program.inspect}"
                 end
       @indent = @indent - 1
     end
