@@ -18,6 +18,8 @@ require 'pp'
   
   Page 
   Parser 
+  Code_Block
+  Env
   Sentence 
   Noun 
   Line 
@@ -26,7 +28,7 @@ require 'pp'
   require "class/#{name}"
 }
 
-# == Parser Plugins
+# == Parsers
 %w{ 
 
   Code_Array_To_Lines
@@ -38,7 +40,7 @@ require 'pp'
   require "class/Parser/#{name}"
 }
 
-# == Sentence Plugins
+# == Sentences
 
 %w{
 
@@ -50,7 +52,7 @@ require 'pp'
 }
 
 
-# == Noun Plugins
+# == Nouns
 %w{ 
 
   Noun_Number
@@ -84,17 +86,17 @@ BASE_ACTIONS = %~
 
 program = Page.new(PROGRAM) {
   name 'main' 
+  plugin Noun_Create
+  plugin Noun_Set_Property
+
+  plugin Noun_Number
+
+  plugin Code_To_Array
+  plugin Code_Array_To_Lines
+  plugin Code_Ignore_Empty_Lines
+  plugin Code_To_Code_Block
 }
 
-program << Noun_Create
-program << Noun_Set_Property
-
-program << Noun_Number
-
-program << Code_To_Array
-program << Code_Array_To_Lines
-program << Code_Ignore_Empty_Lines
-program << Code_To_Code_Block
  
 
 # require 'rubygems'; require 'ruby-debug'; debugger
@@ -106,13 +108,9 @@ puts PROGRAM
 puts ''
 puts ''
 
-program.compile
+program.run
 pp program.nouns
 
-# pp program.lines
-
-# program.run
-# 
 # puts program.backtrace.to_yaml
 
 

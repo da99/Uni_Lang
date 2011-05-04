@@ -3,6 +3,8 @@ class Code_Block
 
   module Module
     
+    attr_reader :env
+
     def initialize parent
       
       case parent
@@ -18,12 +20,16 @@ class Code_Block
         
       end # === case
       
+      @env = Env.new(parent.env)
+      
     end
     
     def execute context
-      raise "implemented"
+      raise "not implemented"
     end
     
   end # === module
+  
+  include Module
 
 end # === class 

@@ -21,18 +21,14 @@ class Page
   end # === class << self
 
   module Module
-
-    attr_reader :code, :lines, :position, :backtrace
-    attr_reader :nouns, :sentences, :parsers, :imports
+    
+    attr_reader :code, :lines, :position, :backtrace, :env
 
     def initialize str, &blok
       @code = str
       @code_block = Code_Block.new( self )
       @lines                = @code
       @backtrace            = []
-
-      @noun_scope           = []
-      @sentence_scope       = []
 
       @parent               = nil # like a code block
       @importer             = nil # like python's 'import'
@@ -42,13 +38,10 @@ class Page
 
       @name                 = "_unknown_"
       @directions           = nil
-      @nouns                = []
-      @sentences            = []
-      @parsers              = []
-      @imports              = []
 
       @code_filters         = []
       @indent               = -1
+      @env = Env.new
 
       instance_eval( &blok ) if block_given?
 
@@ -87,17 +80,16 @@ class Page
       @parent = val
     end
 
-    def parse
+    def run
+      
+      # === Parse code.
       raise "No parses specified." if parsers.empty?
       this = self
       parsers.each { |parser_plugin|
         @lines = parser_plugin.new(this).parse
       }
-    end
 
-    def compile
-      parse
-
+      # === Execute lines.
       index   = 0
       this    = self
       results = []
@@ -128,39 +120,18 @@ class Page
       # scope.backtrace << "#{match.sentence.name}: #{match.args.inspect}\n#{line}\n#{sentence.code}"
     end
 
-    def << obj
-
-      found = [ Noun, Sentence, Parser ].detect { |klass|
-        if klass == obj || 
-          obj.class.included_modules.include?(klass.const_get(:Module)) ||
-          ( obj.respond_to?(:included_modules) && obj.included_modules.include?(klass.const_get(:Module)) )
-          klass
-        else
-          nil
-        end
-      }
-
-      raise "Unknown class for: #{obj.inspect}" unless found
-
-      stack_name = found.to_s.downcase + 's'
-      send( stack_name ).send :<<, obj
-
-      obj
-
-    end
-
-    def run raw_program
-      @indent = @indent + 1
-      program = case program
-                when String
-                  Page.new(program)
-                when Page
-                  raw_program
-                else
-                  raise "Unknown page class: #{raw_program.inspect}"
-                end
-      @indent = @indent - 1
-    end
+    # def run raw_program
+    #   @indent = @indent + 1
+    #   program = case program
+    #             when String
+    #               Page.new(program)
+    #             when Page
+    #               raw_program
+    #             else
+    #               raise "Unknown page class: #{raw_program.inspect}"
+    #             end
+    #   @indent = @indent - 1
+    # end
 
   end # === module
 
