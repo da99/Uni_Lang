@@ -4,15 +4,15 @@ class Line
 
   module Module
 
-    attr_reader :number, :index, :code, :program, :sentences, :args
+    attr_reader :number, :index, :code, :code_block, :sentences, :args
     attr_reader :updates, :skip
 
-    def initialize raw_index, code, program
+    def initialize raw_index, code, code_block
       @number    = raw_index + 1
       @index     = raw_index
       @code      = code
       @ignore    = false
-      @program   = program
+      @code_block   = code_block
       @sentences = []
       @updates   = []
       @args      = {}
@@ -23,8 +23,8 @@ class Line
       return if ignore?
       return if not sentences.empty?
 
-      program.sentences.each { |sentence|
-        sentence.new.match_line( index, program )
+      code_block.sentences.each { |sentence|
+        sentence.new.match_line( index, code_block )
         break if full_match?
       }
 

@@ -58,9 +58,9 @@ class Sentence
       @action === :default
     end 
 
-    def match_line index, program
+    def match_line index, code_block
 
-      line = program.lines[index]
+      line = code_block.lines[index]
 
       args = line.code.scan(pattern_regexp)
 

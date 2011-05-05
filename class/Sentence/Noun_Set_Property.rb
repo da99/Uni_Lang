@@ -11,7 +11,7 @@ class Noun_Set_Property
   def compile line
     prop = line.args.index('Prop')
     val  = line.args.index('Val')
-    noun = line.program.nouns.detect { |n| n.name == line.args.index('Noun') }
+    noun = line.code_block.nouns.detect { |n| n.name == line.args.index('Noun') }
     
     noun.set prop, val
     

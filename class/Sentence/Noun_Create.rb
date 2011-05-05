@@ -14,7 +14,7 @@ class Noun_Create
     
     noun = Noun_By_User.new( name )
     noun.ancestors << ancestor
-    line.program << noun
+    line.code_block << noun
     pp line.args 
     puts ''
   end

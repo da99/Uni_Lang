@@ -22,9 +22,10 @@ class Page
 
   module Module
     
-    attr_reader :position, :backtrace
+    attr_reader :position, :backtrace, :parent, :code_block
 
     def initialize str, &blok
+      @parent = nil
       @code_block = Code_Block.new( self , str )
       @backtrace            = []
 

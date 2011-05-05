@@ -3,10 +3,10 @@ class Parser
 
   module Module
     
-    attr_reader :program
+    attr_reader :code_block
     
-    def initialize program
-      @program = program
+    def initialize code_block
+      @code_block = code_block
     end
 
   end # === module 

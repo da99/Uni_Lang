@@ -19,7 +19,6 @@ require 'pp'
   Page 
   Parser 
   Code_Block
-  Env
   Sentence 
   Noun 
   Line 
@@ -69,9 +68,9 @@ program = Page.new(PROGRAM) {
   # == Parsers
   %w{ 
 
+    Code_To_Array
     Code_Array_To_Lines
     Code_Ignore_Empty_Lines
-    Code_To_Array
     Code_To_Code_Block
 
   }.each { |name|
@@ -80,10 +79,10 @@ program = Page.new(PROGRAM) {
   }
   
   # == Nouns
-    # Noun_By_User
   %w{ 
 
     Noun_Number
+    Noun_By_User
 
   }.each { |name|
     require "class/Noun/#{name}"
@@ -93,17 +92,17 @@ program = Page.new(PROGRAM) {
     
 }
 
- 
-# require 'rubygems'; require 'ruby-debug'; debugger
-
 
 puts PROGRAM
 
 puts ''
 puts ''
 
-program.run
-pp program.nouns
+#  
+# require 'rubygems'; require 'ruby-debug'; debugger
+
+program.code_block.run
+pp program.code_block.nouns
 
 # puts program.backtrace.to_yaml
 

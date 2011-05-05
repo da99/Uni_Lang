@@ -3,40 +3,79 @@ class Code_Block
 
   module Module
     
-    attr_reader :parent, :code
+    attr_reader :parent, :code, :lines
     attr_reader :sentences, :nouns, :parsers, :imports
 
     def initialize parent, code_as_string
-
-      @parent = parent
-      @code   = code_as_string
-      
-      outer = parent.code_block || self.class.new
-      outer_noun = Noun.new {
-        name 'Outer-Block'
-        value outer
-      }
-      @sentences = []
-      @nouns     = [ outer_noun ]
-      @parsers   = []
-      @imports   = []
       
       case parent
       when Page
-        @env = Env.new
-      when Sentence
-        @env = Env.new
-      when Line
-        @env = Env.new
+        outer = parent.parent && parent.parent.code_block 
+      when Sentence, Line
+        outer = parent.parent.code_block # code_block of a page
       else
         raise "Unknown class for parent: #{parent.inspect}"
       end # === case
       
+      @parent = parent
+      @code   = code_as_string
+      @lines  = @code
+      @sentences = []
+      @nouns     = []
+      @parsers   = []
+      @imports   = []
+      
+      if outer
+        outer_noun =  Noun.new {
+          name 'Outer-Block'
+          value outer
+        }
+        @nouns << outer_noun
+      end
+      
     end
     
-    def execute context
-      raise "not implemented"
+    def run
+      
+      # === Parse code.
+      raise "No parses specified." if parsers.empty?
+      this = self
+      parsers.each { |parser_plugin|
+        @lines = parser_plugin.new(this).parse
+      }
+
+      # === Execute lines.
+      index   = 0
+      this    = self
+      results = []
+
+      while index < @lines.size
+
+        line  = @lines[index]
+
+        unless line.ignore?
+
+          line.match
+
+          if line.partial_match?
+            raise "Did not completely match: #{line.number}: #{line.code}"
+          end
+
+          if not line.matched?
+            raise "Did not match: #{line.code}"
+          end
+          
+        end
+
+        line.compile
+
+        index += line.skip
+
+      end
+
+      # scope.backtrace << "#{match.sentence.name}: #{match.args.inspect}\n#{line}\n#{sentence.code_block.code}"
     end
+
     
     def << obj
 

@@ -5,10 +5,17 @@ class Code_To_Array
   include Parser::Module
   
   def parse
-    lines = program.code_block.lines
-    return lines if lines.is_a?(Array)
+    lines = code_block.lines
+    
+    new_lines = if lines.respond_to?(:split)
+                  lines.split("\n")
+                else
+                  lines
+                end
 
-    program.code.split("\n")
+    raise "Empty code block" if new_lines.empty?
+    
+    new_lines
   end
 
 end # === Code_To_Array
