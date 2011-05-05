@@ -28,39 +28,7 @@ require 'pp'
   require "class/#{name}"
 }
 
-# == Parsers
-%w{ 
 
-  Code_Array_To_Lines
-  Code_Ignore_Empty_Lines
-  Code_To_Array
-  Code_To_Code_Block
-
-}.each { |name|
-  require "class/Parser/#{name}"
-}
-
-# == Sentences
-
-%w{
-
-  Noun_Create
-  Noun_Set_Property
-
-}.each { |name|
-  require "class/Sentence/#{name}"
-}
-
-
-# == Nouns
-%w{ 
-
-  Noun_Number
-  Noun_By_User
-
-}.each { |name|
-  require "class/Noun/#{name}"
-}
 
 # ========================================================
 
@@ -86,21 +54,47 @@ BASE_ACTIONS = %~
 
 program = Page.new(PROGRAM) {
   name 'main' 
-  plugin Noun_Create
-  plugin Noun_Set_Property
+  
+  # == Sentences
+  %w{
 
-  plugin Noun_Number
+    Noun_Create
+    Noun_Set_Property
 
-  plugin Code_To_Array
-  plugin Code_Array_To_Lines
-  plugin Code_Ignore_Empty_Lines
-  plugin Code_To_Code_Block
+  }.each { |name|
+    require "class/Sentence/#{name}"
+    code_block.plugin eval(name)
+  }
+
+  # == Parsers
+  %w{ 
+
+    Code_Array_To_Lines
+    Code_Ignore_Empty_Lines
+    Code_To_Array
+    Code_To_Code_Block
+
+  }.each { |name|
+    require "class/Parser/#{name}"
+    code_block.plugin eval(name)
+  }
+  
+  # == Nouns
+    # Noun_By_User
+  %w{ 
+
+    Noun_Number
+
+  }.each { |name|
+    require "class/Noun/#{name}"
+    code_block.plugin eval(name)
+  }
+
+    
 }
 
  
-
 # require 'rubygems'; require 'ruby-debug'; debugger
-
 
 
 puts PROGRAM

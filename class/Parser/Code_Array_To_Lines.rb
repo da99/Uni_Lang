@@ -5,9 +5,10 @@ class Code_Array_To_Lines
   include Parser::Module
 
   def parse
-    lines = program.lines
+    lines = program.code_block.lines
     new_lines  = []
-    program.lines.each_index { |index|
+    
+    lines.each_index { |index|
       line = lines[index]
       new = if line.is_a?(String)
               Line.new index, line, program

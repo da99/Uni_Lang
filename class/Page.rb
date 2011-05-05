@@ -22,26 +22,20 @@ class Page
 
   module Module
     
-    attr_reader :code, :lines, :position, :backtrace, :env
+    attr_reader :position, :backtrace
 
     def initialize str, &blok
-      @code = str
-      @code_block = Code_Block.new( self )
-      @lines                = @code
+      @code_block = Code_Block.new( self , str )
       @backtrace            = []
-
-      @parent               = nil # like a code block
-      @importer             = nil # like python's 'import'
 
       @starting_line_number = 0
       @current_line_number  = 0
 
-      @name                 = "_unknown_"
+      @name                 = "_unknown_ #{rand}"
       @directions           = nil
 
       @code_filters         = []
       @indent               = -1
-      @env = Env.new
 
       instance_eval( &blok ) if block_given?
 
@@ -109,6 +103,7 @@ class Page
           if not line.matched?
             raise "Did not match: #{line.code}"
           end
+          
         end
 
         line.compile
@@ -117,7 +112,7 @@ class Page
 
       end
 
-      # scope.backtrace << "#{match.sentence.name}: #{match.args.inspect}\n#{line}\n#{sentence.code}"
+      # scope.backtrace << "#{match.sentence.name}: #{match.args.inspect}\n#{line}\n#{sentence.code_block.code}"
     end
 
     # def run raw_program
