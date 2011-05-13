@@ -4,17 +4,20 @@ class Noun
   
   module Module
 
-    attr_reader :name, :propertys, :ancestors
+    attr_reader :propertys, :ancestors
+		attr_accessor :name, :importable
 
-    def initialize name, props = {}, actions = []
-      @name         = name
-      @props        = props
-      @actions      = actions
+    def initialize 
+      @props     = {}
+      @actions   = []
       @ancestors = []
-
-      @modules = []
-      @icrud = {}
+			@importable = false
+      @modules   = []
+      @icrud     = {}
       @propertys = {}
+			yield(self)
+			raise "Name is required." unless @name
+
     end
 
     def data_type?
@@ -27,18 +30,19 @@ class Noun
       }
     end
 
-    def has? name
-      propertys.has_key?(name)
+    def create_property &blok
+			new_prop = Noun_Property.new(&blok) 
+			name = new_prop.name
+			raise "Property, #{name}, already created." if propertys[name]
+			propertys[name] = new_prop
     end
-
-    def set name, val
-      propertys[name] = val
-    end
-
-    def get name
-      raise "Unknown property: #{name.inspect}" unless has?(name)
-      propertys[name]
-    end
+		
+		def update_property name, val
+			prop = propertys[name]
+			raise "Property does not exist: #{name}" unless prop
+			raise "Property can not be updated: #{name}" unless prop.updateable
+			prop.value = val
+		end
 
     def on_initialize
     end
@@ -57,6 +61,10 @@ class Noun
 
     def on_undelete
     end
+
+		def inspect_informally
+			"#{name} (#{self.class.name}) - #{propertys.map { |pair| pair.first.to_s + ': ' + pair.last.value.to_s }.join(', ') }"
+		end
 
   end # === module
 

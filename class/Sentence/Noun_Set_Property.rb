@@ -11,12 +11,13 @@ class Noun_Set_Property
   def compile line
     prop = line.args.index('Prop')
     val  = line.args.index('Val')
-    noun = line.code_block.nouns.detect { |n| n.name == line.args.index('Noun') }
+    noun = line.code_block.detect_noun { |n| n.name == line.args.index('Noun') }
     
-    noun.set prop, val
-    
-    puts "#{prop} of #{noun.name} has been set to #{val}"
-    puts ''
+		noun.create_property { |o|
+			o.name       = prop
+			o.value      = val
+			o.updateable = false
+		}
   end
 
 end # === class Noun_Set_Property

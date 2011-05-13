@@ -5,7 +5,7 @@ class Line
   module Module
 
     attr_reader :number, :index, :code, :code_block, :sentences, :args
-    attr_reader :updates, :skip
+    attr_reader :skip
 
     def initialize raw_index, code, code_block
       @number    = raw_index + 1
@@ -14,7 +14,6 @@ class Line
       @ignore    = false
       @code_block   = code_block
       @sentences = []
-      @updates   = []
       @args      = {}
       @skip      = 1
     end
@@ -22,13 +21,8 @@ class Line
     def match
       return if ignore?
       return if not sentences.empty?
-
-      code_block.sentences.each { |sentence|
-        sentence.new.match_line( index, code_block )
-        break if full_match?
-      }
-
-      not sentences.empty?
+			this = self
+      @sentences = code_block.match_line_to_sentences(self)
     end
 
     def compile
@@ -49,11 +43,11 @@ class Line
     end
 
     def matched?
-      not updates.empty?
+      not sentences.empty?
     end
 
     def full_match?
-      matched? && updates.last == Sentence::Done_Line
+      sentences.detect { |sent| sent.full_match }
     end
 
     def partial_match?
@@ -62,6 +56,11 @@ class Line
 
     def skip_next num
       @skip += num
+    end
+
+    def add_to_code_block str
+      @code_block_code ||= []
+      @code_block_code << str.sub(/\A  /,'')
     end
 
   end # === module

@@ -1,5 +1,7 @@
 
 
+require "class/Not_In_Pattern"
+
 class Sentence
 
   module Module
@@ -9,15 +11,19 @@ class Sentence
 
     attr_reader :name, :code, :action, :pattern, :pattern_regexp,
       :args, :args_ordered, :replace_pattern, :replace_pattern_regexp, :is_partial
+		attr_accessor :full_match, :matched
+
+		private :full_match=, :matched=
 
     def initialize name, code, action = :default
       # === PATTERNS
       space = '\\ {0,}'
       word  = "[^\ ]+"
-      arg_pattern = %r!\[#{space}([^\ ]+)#{space}([^\ ]+)?#{space}\]!
-      split_pattern = %r!\[#{space}[^\ ]+#{space}[^\ ]{0,}#{space}\]!
+			arg_pattern   = %r!\[#{space}([^\ ]+)#{space}([^\ ]+)?#{space}\]!
+			split_pattern = %r!\[#{space}[^\ ]+#{space}[^\ ]{0,}#{space}\]!
 
       @action = action
+			@full_match = false
       @is_partial = false
       @name = name
       @code = code
@@ -25,12 +31,14 @@ class Sentence
       @arg_wrappers = code.
         split(split_pattern).
         map { |piece| Regexp.escape(piece) }
+			@arg_wrappers = Not_In_Pattern.new(code).gsub(arg_pattern) { |piece|
+				Regexp.escape(piece)
+			}
 
-      @pattern = @arg_wrappers.
-        join('(' + word + ')') 
+      @pattern = @arg_wrappers.gsub(arg_pattern, '(' + word + ')')
       @pattern_regexp = Regexp.new(@pattern)
 
-      @replace_pattern = @arg_wrappers.join(word)
+			@replace_pattern = @arg_wrappers.gsub(arg_pattern, word)
       @replace_pattern_regexp = Regexp.new(@replace_pattern)
 
       begin
@@ -58,35 +66,34 @@ class Sentence
       @action === :default
     end 
 
-    def match_line index, code_block
-
-      line = code_block.lines[index]
+    def match_line line
 
       args = line.code.scan(pattern_regexp)
 
-      return line if args.empty?
-      #   raise No_Match, "#{line.code} |->| #{code}"
-      # end
+      return false if args.empty?
 
       args_with_vals = []
+			entire_line_matches = args.size == 1 && args.first == line.code
 
-      args.each { |each_match|
-        pairs = each_match.zip(args_ordered)
-        args_with_vals << pairs.inject({}) { |memo, pair|
-          memo[pair[0]] = pair[1][0]
-          memo
-        }
-      }
+			if not entire_line_matches
+				args.each { |each_match|
+					pairs = each_match.zip(args_ordered)
+					args_with_vals << pairs.inject({}) { |memo, pair|
+						memo[pair[0]] = pair[1][0]
+						memo
+					}
+				}
+			end
 
-      line.sentences << self
-      line.updates << line.code.gsub(replace_pattern_regexp, Done_Line)
+			self.matched = true
+			self.full_match = Done_Line == line.code.gsub(replace_pattern_regexp, Done_Line)
       args_with_vals.each { |hash|
         line.args.merge! hash
       }
 
-      line
+      true
     end
-
+		
   end # === module 
   
   include Module
