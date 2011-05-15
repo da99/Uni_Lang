@@ -4,42 +4,48 @@ class Line
 
   module Module
 
-    attr_reader :number, :index, :code, :code_block, :sentences, :args
+    attr_reader :number, :code_block, :sentences, :args
     attr_reader :skip
+    attr_accessor :parent, :index, :code, :ignore
 
-    def initialize raw_index, code, code_block
-      @number    = raw_index + 1
-      @index     = raw_index
-      @code      = code
+    def initialize
       @ignore    = false
-      @code_block   = code_block
       @sentences = []
       @args      = {}
       @skip      = 1
+      
+      yield self
+
+      if !@parent
+        raise "No parent stated."
+      end
+
+      if !@index
+        raise "No index stated. This is the array index of lines in code block."
+      end
+      
+      if !@code
+        raise "No text provided for line."
+      end
+      
+      @number    = @index + 1
+      
     end
 
     def match
-      return if ignore?
+      return if ignore
       return if not sentences.empty?
 			this = self
-      @sentences = code_block.match_line_to_sentences(self)
+      @sentences = parent.match_line_to_sentences(self)
     end
 
     def compile
-      return if ignore?
+      return if ignore
       sentences.last.compile self
     end
 
     def empty?
       code.strip.empty?
-    end
-
-    def ignore?
-      @ignore
-    end
-
-    def ignore_this
-      @ignore = true
     end
 
     def matched?

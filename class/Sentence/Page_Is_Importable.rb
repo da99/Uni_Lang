@@ -9,7 +9,7 @@ class Page_Is_Importable
   end
 
   def compile line
-    page = line.code_block.parent
+    page = line.parent.parent
 
     raise "This line can only be used at top of page." unless page.is_a?(Page)
     page.importable = true

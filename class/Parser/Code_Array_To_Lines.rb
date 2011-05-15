@@ -29,7 +29,11 @@ class Code_Array_To_Lines
         (!spaces && !empty)
         
         new = if line.is_a?(String)
-                Line.new index, line, code_block
+                Line.new { |o|
+                  o.index = index
+                  o.code = line
+                  o.parent = code_block
+                }
               else
                 line
               end

@@ -9,7 +9,7 @@ class Code_Ignore_Empty_Lines
 		
     lines.each { |line|
       if line.empty?
-        line.ignore_this
+        line.ignore = true
       end
     }
 

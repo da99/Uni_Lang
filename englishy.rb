@@ -186,6 +186,9 @@ module Askable
 
 end # === module Askable
 
-
+TODO:
+  * property of Noun => (partial sentence)
+  * Sentence definition.
+  * HTML/CSS/JS converters.
 
 

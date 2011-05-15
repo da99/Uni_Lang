@@ -11,10 +11,10 @@ class Noun_Create
   def compile line
     name     = line.args.index('Word')
     ancestor = line.args.index('Noun')
-		parent     = line.code_block.parent
+		parent     = line.parent.parent
 		importable = parent.is_a?(Page) && parent.importable
 		
-		line.code_block.create_noun { |o|
+		line.parent.create_noun { |o|
 			o.name = name
 			o.ancestors << ancestor
 			o.importable = importable

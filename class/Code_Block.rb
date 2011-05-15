@@ -144,7 +144,7 @@ class Code_Block
 
         line  = @lines[index]
 
-        unless line.ignore?
+        unless line.ignore
 
           line.match
 
