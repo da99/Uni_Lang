@@ -9,8 +9,8 @@ class Import_As
   end
 
   def compile line
-    name    = line.args.index('Name')
-    address = line.args.index('Address')
+    name    = line.args['Name'].value
+    address = line.args['Address'].value
     line.parent.import address, name
   end
 

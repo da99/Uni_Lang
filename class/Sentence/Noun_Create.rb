@@ -9,8 +9,8 @@ class Noun_Create
   end
 
   def compile line
-    name     = line.args.index('Word')
-    ancestor = line.args.index('Noun')
+    name     = line.args['Word'].value
+    ancestor = line.args['Noun'].value
 		parent     = line.parent.parent
 		importable = parent.is_a?(Page) && parent.importable
 		

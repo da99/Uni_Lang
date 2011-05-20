@@ -23,6 +23,7 @@ require 'pp'
   Noun 
   Noun_Property
   Line 
+  Argument
   
 }.each { |name|
   require "class/#{name}"
@@ -44,7 +45,7 @@ The real-home of Rocket-Man is Boise,ID.
   I am another thing.
 
 Import page as Content-Code: CONTENT
-
+The second-home of Rocket-Man is the real-home of Rocket-Man.
 ~
 
 BASE_ACTIONS = %~
@@ -116,6 +117,7 @@ core = Code_Block.new { |o|
 %w{
   Noun_Create
   Noun_Set_Property
+  Property_Of_Noun
   Import_As
   Page_Is_Importable
 }.each { |name|
@@ -189,6 +191,7 @@ end # === module Askable
 TODO:
   * property of Noun => (partial sentence)
   * Sentence definition.
+  * Passing outer, local, etc. scopes.
   * HTML/CSS/JS converters.
 
 

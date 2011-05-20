@@ -11,14 +11,14 @@ class Sentence
 
     attr_reader :name, :code, :action, :pattern, :pattern_regexp,
       :args, :args_ordered, :replace_pattern, :replace_pattern_regexp, :is_partial
-		attr_accessor :full_match, :matched
+		attr_accessor :full_match, :matched, :has_args
 
-		private :full_match=, :matched=
+		private :full_match=, :matched=, :has_args=
 
     def initialize name, code, action = :default
       # === PATTERNS
       space = '\\ {0,}'
-      word  = "[^\ ]+"
+      word  = "[^\ ]+[[:alnum:]]"
 			arg_pattern   = %r!\[#{space}([^\ ]+)#{space}([^\ ]+)?#{space}\]!
 			split_pattern = %r!\[#{space}[^\ ]+#{space}[^\ ]{0,}#{space}\]!
 
@@ -27,18 +27,22 @@ class Sentence
       @is_partial = false
       @name = name
       @code = code
-
-      @arg_wrappers = code.
-        split(split_pattern).
-        map { |piece| Regexp.escape(piece) }
+      @has_args = false
+        
+      # @arg_wrappers = code.
+      #   split(split_pattern).
+      #   map { |piece| Regexp.escape(piece) }
+      
 			@arg_wrappers = Not_In_Pattern.new(code).gsub(arg_pattern) { |piece|
 				Regexp.escape(piece)
 			}
 
       @pattern = @arg_wrappers.gsub(arg_pattern, '(' + word + ')')
+      
       @pattern_regexp = Regexp.new(@pattern)
 
 			@replace_pattern = @arg_wrappers.gsub(arg_pattern, word)
+      
       @replace_pattern_regexp = Regexp.new(@replace_pattern)
 
       begin
@@ -57,8 +61,11 @@ class Sentence
           ordered << [label, type]
         }
 
+        self.has_args = !args.empty?
         @args = args
         @args_ordered = ordered
+        
+        
       end
     end
 
@@ -66,32 +73,102 @@ class Sentence
       @action === :default
     end 
 
-    def match_line line
+    def match_line_and_compile line
 
-      args = line.code.scan(pattern_regexp)
+      begin
+        line.args.clear
+        match = line.code_for_sentence_matcheing.match(pattern_regexp)
+        
+        if match
+          the_code = line.code_for_sentence_matcheing
+          pos            = match.offset(0)
+          args           = match.captures
+          
+          self.matched = true
+          self.full_match = pos.last == the_code.size
+          line.sentences << self
+        
+          if !args.empty?
+            
+            new_args = args.zip(args_ordered).inject({}) { |memo, pair|
+              
+              val  = line.carry_over_args[pair.first] || pair.first
+              name = pair[1].first
+              type = pair[1].last
+              
+              memo[name] = Argument.new { |o|
+                o.name         = name
+                o.target_class = type
+                o.value        = val
+                o.code         = val
+              }
+              
+              memo
+            }
+            
+            line.args.merge! new_args
+            
+          end
+          
+          compile line
+          
+          if self.full_match
+          elsif the_code != line.code_for_sentence_matcheing
+          else # partial match with no update to code
+            raise "This functionality not done."
+            
+            the_code = line.code_for_sentence_matcheing
+            # Code has not been changed. 
+            # Next time, match only the next part of the code string.
+            starting_pos = pos.last
+          end
+          
+        end
+      end while match && !self.full_match
+      
+      # ==============================================
+      # ==============================================
+      # the_code = line.code_for_sentence_matcheing
+      # the_offset = []
+      # 
+      # the_code.scan(pattern_regexp) { |matches|
+      #   
+      #   args           = []
+      #   args_with_vals = []
+      #   
+      #   # Don't use the match if sentence has no arguments.
+      #   #   Examples: This page is importable.
+      #   #   The scan would return for matches: "This page is importable"
+      #   if not matches.is_a?(String)
+      #     args = args + matches
+      #   end
 
-      return false if args.empty?
+      #   if self.has_args 
+      #     pairs = args.zip(args_ordered)
+      #     args_with_vals << pairs.inject({}) { |memo, pair|
+      #       memo[pair[0]] = pair[1][0]
+      #       memo
+      #     }
+      #   end
+      #   
+      #   args_with_vals.each { |hash|
+      #     line.args.merge! hash
+      #   }
+      #   
+      #   compile line
+  
+      #   the_offset << $~.offset(0).first if !the_offset.first
+      #   the_offset << $~.offset(0).last
+      #   
+      #   
+      # }
 
-      args_with_vals = []
-			entire_line_matches = args.size == 1 && args.first == line.code
-
-			if not entire_line_matches
-				args.each { |each_match|
-					pairs = each_match.zip(args_ordered)
-					args_with_vals << pairs.inject({}) { |memo, pair|
-						memo[pair[0]] = pair[1][0]
-						memo
-					}
-				}
-			end
-
-			self.matched = true
-			self.full_match = Done_Line == line.code.gsub(replace_pattern_regexp, Done_Line)
-      args_with_vals.each { |hash|
-        line.args.merge! hash
-      }
-
-      true
+      # self.matched = !the_offset.empty?
+      # self.full_match = the_offset.first == 0 && the_offset.last == the_code.size
+      # 
+      # (line.sentences << self) if self.matched
+      # 
+      # self.matched
     end
 		
   end # === module 

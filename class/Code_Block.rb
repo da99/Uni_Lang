@@ -74,22 +74,31 @@ class Code_Block
       
       found
     end
+		
+		def detect_noun_named noun_name
+			detect_noun  { |noun|
+				noun.name == noun_name
+			}
+		end
 
-    def match_line_to_sentences line
+    def match_line_to_sentences_and_compile line
       
-      new_sentences = [] 
 			sentences.each { |scope|
         
-        new_sentences << if scope.respond_to?(:new)
+        if scope.respond_to?(:new)
           
           sentence = scope.new
-          sentence.match_line( line )
+          sentence.match_line_and_compile( line )
           sentence if sentence.matched
             
-        elsif scope.respond_to?(:match_line_to_sentences)
+        elsif scope.respond_to?(:match_line_to_sentences_and_compile)
           
-          scope.match_line_to_sentences line
+          scope.match_line_to_sentences_and_compile line
           
+        elsif scope.is_a?(Page)
+
+          scope.code_block.match_line_to_sentences_and_compile line
+
         else
           
           raise "Unknown sentence class: #{scope.inspect}"
@@ -101,8 +110,6 @@ class Code_Block
         end
         
       }
-      
-      new_sentences.flatten.compact
       
     end
     
@@ -146,7 +153,7 @@ class Code_Block
 
         unless line.ignore
 
-          line.match
+          line.match_and_compile
 
           if line.partial_match?
             raise "Did not completely match: #{line.number}: #{line.code}"
@@ -158,7 +165,6 @@ class Code_Block
           
         end
 
-        line.compile
 
         index += line.skip
 

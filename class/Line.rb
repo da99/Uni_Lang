@@ -4,14 +4,14 @@ class Line
 
   module Module
 
-    attr_reader :number, :code_block, :sentences, :args
-    attr_reader :skip
-    attr_accessor :parent, :index, :code, :ignore
+    attr_reader :number, :code_block, :sentences, :args, :carry_over_args, :skip
+    attr_accessor :parent, :index, :code, :ignore, :code_for_sentence_matcheing
 
     def initialize
       @ignore    = false
       @sentences = []
       @args      = {}
+      @carry_over_args = {}
       @skip      = 1
       
       yield self
@@ -32,17 +32,18 @@ class Line
       
     end
 
-    def match
+    def match_and_compile
       return if ignore
       return if not sentences.empty?
-			this = self
-      @sentences = parent.match_line_to_sentences(self)
+      self.code_for_sentence_matcheing = self.code
+      parent.match_line_to_sentences_and_compile(self)
+      self.code_for_sentence_matcheing = nil
     end
 
-    def compile
-      return if ignore
-      sentences.last.compile self
-    end
+    # def compile
+    #   return if ignore
+    #   sentences.last.compile self
+    # end
 
     def empty?
       code.strip.empty?

@@ -44,6 +44,10 @@ class Noun
 			prop.value = val
 		end
 
+		def detect_property_named prop_name
+			propertys[prop_name]
+		end
+
     def on_initialize
     end
 

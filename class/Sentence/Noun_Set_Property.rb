@@ -9,9 +9,10 @@ class Noun_Set_Property
   end
 
   def compile line
-    prop = line.args.index('Prop')
-    val  = line.args.index('Val')
-    noun = line.parent.detect_noun { |n| n.name == line.args.index('Noun') }
+    prop      = line.args['Prop'].value
+    val       = line.args['Val'].value
+    noun_name = line.args['Noun'].value
+    noun      = line.parent.detect_noun_named( noun_name )
     
 		noun.create_property { |o|
 			o.name       = prop
