@@ -1,24 +1,42 @@
 
-
-class Noun_Set_Property
-  
-  include Sentence::Module
-
-  def initialize
-    super 'noun-set-property', "The [Word Prop] of [Noun] is [Word Val]."
-  end
-
-  def compile line
-    prop      = line.args['Prop'].value
-    val       = line.args['Val'].value
-    noun_name = line.args['Noun'].value
-    noun      = line.parent.detect_noun_named( noun_name )
+class Uni_Lang
+  module Core
     
-		noun.create_property { |o|
-			o.name       = prop
-			o.value      = val
-			o.updateable = false
-		}
-  end
+    Noun_Set_Property = Noun.new { |o|
+      
+      o.name = 'noun-set-property'
+      o.ancestor << 'Sentence'
+      o.importable = true
+      o.create_property { |prop|
+        
+        prop.name = 'pattern'
+        prop.value = "The [Word Prop] of [Noun] is [Word Val]."
+        prop.updateable = false
 
-end # === class Noun_Set_Property
+      }
+      o.events << Event.new { |e|
+        e.name = 'compile'
+        e.action_proc = lambda { |ev|
+          line      = ev.arguments['line']
+          prop      = line.args['Prop'].value
+          val       = line.args['Val'].value
+          noun_name = line.args['Noun'].value
+          noun      = line.parent.detect_noun_named( noun_name )
+
+          if !noun
+            raise "Noun does not exist: #{noun_name}"
+          end
+
+          noun.create_property { |o|
+            o.name       = prop
+            o.value      = val
+            o.updateable = false
+          }
+        }
+      }
+
+    }
+
+  end # === core
+end # === class
+

@@ -4,12 +4,12 @@ class Noun
   
   module Module
 
-    attr_reader :propertys, :ancestors
+    attr_reader :propertys, :ancestors, :events
 		attr_accessor :name, :importable
 
     def initialize 
       @props     = {}
-      @actions   = []
+      @events    = []
       @ancestors = []
 			@importable = false
       @modules   = []

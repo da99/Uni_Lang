@@ -46,6 +46,10 @@ The real-home of Rocket-Man is Boise,ID.
 
 Import page as Content-Code: CONTENT
 The second-home of Rocket-Man is the real-home of Rocket-Man.
+The second-job of Rocket-Man is the real-job of Rocket-Man.
+
+
+
 ~
 
 BASE_ACTIONS = %~
@@ -59,8 +63,33 @@ BASE_ACTIONS = %~
 ~
 
 %~
-Create a new content box.
   
+Web-Page is a Noun.
+Insert Web-Page into the Importer-Page.
+
+Paragraph is a Noun.
+
+Quick-Paragraph is a Sentence.
+A pattern for Quick-Paragraph:
+  
+  Paragraph:
+
+Quick-Paragraph requires a code block.
+Quick-Paragraph does:
+
+  P is a new Paragraph.
+  The text for P is the code-block of Calling-Line.
+  Insert P into the Web-Page of Calling-Page.
+
+
+
+
+
+
+Alias pattern
+
+
+
 Paragraph:
 
   This is a paragraph.
@@ -122,7 +151,7 @@ core = Code_Block.new { |o|
   Page_Is_Importable
 }.each { |name|
   require "class/Sentence/#{name}"
-  core.plugin eval(name)
+  core.plugin eval("Uni_Lang::Core::#{name}")
 }
 
 program = Page.new { |o|
