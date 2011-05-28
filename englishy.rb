@@ -135,11 +135,10 @@ core = Code_Block.new { |o|
 
 # == Nouns
 %w{ 
-  Noun_Number
-  Noun_By_User
+  Sentence
 }.each { |name|
   require "class/Noun/#{name}"
-  core.plugin eval(name)
+  core.plugin eval("Uni_Lang::Core::#{name}")
 }
 
 # == Sentences

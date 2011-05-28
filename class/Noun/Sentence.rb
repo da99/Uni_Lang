@@ -14,42 +14,27 @@ class Uni_Lang
       n.value = n
       n.updateable = false
       
-      class << n
-        attr_reader :name, :patterns, :action, :args, :args_ordered
-        attr_accessor :full_match, :matched, :has_args
-
-        private :full_match=, :matched=, :has_args=
-      end
+      # attr_accessor :full_match, :matched, :has_args
+      # private :full_match=, :matched=, :has_args=
       
-      n.events << Event.new { |e|
-        
-        e.name = 'Create patterns.'
-        e.time = 'before create'
-        e.action_proc = lambda { |ev|
-          n.create_property { |prop|
-            prop.name = 'patterns'
-            prop.value = []
-            prop.updateable = false
-          }
+      n.on('before create of self') do |e|
+        n.create_property { |prop|
+          prop.name = 'patterns'
+          prop.value = []
+          prop.updateable = false
         }
+      end
+
+      n.on('overwrite create of property named pattern') { |e|
+        
+        n.get_property_value('patterns') << Sentence_Pattern.new(n, e.arguments['pattern'])
 
       }
 
-      n.events << Event.new { |e|
+      n.on('match line and compile') do |e| 
+
+        line = e.arguments['line']
         
-        e.name = 'Pattern created.'
-        e.time = 'overwrite create property pattern'
-        e.action_proc = lambda { |ev|
-          n.get_property('patterns') << Sentence_Pattern.new(n, arguments['pattern'])
-          n.create_property { |prop|
-            prop.name = 'patter'
-          }
-        }
-
-      }
-
-      def n.match_line_and_compile line
-
         begin
           line.args.clear
           match = line.code_for_sentence_matcheing.match(pattern_regexp)
@@ -103,7 +88,9 @@ class Uni_Lang
 
       end
 
-      def n.add_arguments type_and_name_array
+      n.on('add arguments of pattern') do |e|
+        
+        type_and_name_array = e.arguments['arguments']
 
         raise "Code has different arguments to: #{code}, #{other}"
 

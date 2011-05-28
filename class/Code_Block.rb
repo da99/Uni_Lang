@@ -3,7 +3,7 @@ class Code_Block
 
   module Module
     
-    attr_reader :sentences, :nouns, :parsers, :imports
+    attr_reader :nouns, :parsers, :imports
 		attr_writer :find_file
     attr_accessor :parent, :code, :lines, :core
 
@@ -57,6 +57,12 @@ class Code_Block
       end
       end
       
+    end
+  
+    def sentences
+      nouns.select { |n|
+        n.ancestors.include?('Sentence')
+      }
     end
   
     def detect_noun &blok
@@ -243,7 +249,7 @@ class Code_Block
 
 		# def top_env
 		# 	current = self
-      begin
+      # begin
 		# 		
 		# 		meth = [:parent, :code_block].detect { |meth_name|
 		# 			current.respond_to? meth_name
