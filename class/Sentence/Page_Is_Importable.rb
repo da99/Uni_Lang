@@ -15,11 +15,11 @@ class Uni_Lang
       }
       
       o.on('compile') { |ev|
-				line = ev.arguments['line']
-				page = line.parent.parent
+        line = ev.arguments['line']
+        page = line.parent.parent
 
-				raise "This line can only be used at top of page." unless page.is_a?(Page)
-				page.importable = true
+        raise "This line can only be used at top of page." unless page.is_a?(Page)
+        page.importable = true
       }
       
     }

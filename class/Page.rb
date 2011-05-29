@@ -45,10 +45,10 @@ class Page
     def is_importable
       @importable = true
     end
-		
-		def inspect_informally
-			"Page - file address: #{file_address}"
-		end
+    
+    def inspect_informally
+      "Page - file address: #{file_address}"
+    end
 
   end # === module
 

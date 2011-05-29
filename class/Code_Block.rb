@@ -4,7 +4,7 @@ class Code_Block
   module Module
     
     attr_reader :nouns, :parsers, :imports
-		attr_writer :find_file
+    attr_writer :find_file
     attr_accessor :parent, :code, :lines, :core
 
     protected :lines=
@@ -80,16 +80,16 @@ class Code_Block
       
       found
     end
-		
-		def detect_noun_named noun_name
-			detect_noun  { |noun|
-				noun.name == noun_name
-			}
-		end
+    
+    def detect_noun_named noun_name
+      detect_noun  { |noun|
+        noun.name == noun_name
+      }
+    end
 
     def match_line_to_sentences_and_compile line
       
-			sentences.each { |scope|
+      sentences.each { |scope|
         
         if scope.respond_to?(:new)
           
@@ -247,17 +247,17 @@ class Code_Block
       find_file
     end
 
-		# def top_env
-		# 	current = self
+    # def top_env
+    #   current = self
       # begin
-		# 		
-		# 		meth = [:parent, :code_block].detect { |meth_name|
-		# 			current.respond_to? meth_name
-		# 		}
-		# 		
-		# 		current.send meth
-		# 	end	while next_parent.nil?
-		# end
+    #     
+    #     meth = [:parent, :code_block].detect { |meth_name|
+    #       current.respond_to? meth_name
+    #     }
+    #     
+    #     current.send meth
+    #   end  while next_parent.nil?
+    # end
     
     def core_code_block
       return nil if core

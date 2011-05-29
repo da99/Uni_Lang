@@ -2,8 +2,8 @@
 When line is partially matched against all sentences.
 
 New Sentence: Import page as [Word Name]: [Word Address]
-	should generate regexp pattern: " /Import\ page\ as\ ([^ ]+):\ ([^ ]+)\/ "
-		
+  should generate regexp pattern: " /Import\ page\ as\ ([^ ]+):\ ([^ ]+)\/ "
+    
 Only one noun can be created with the same name.
 Nouns found in other scope are visible if importable is set to true.
 
@@ -12,7 +12,7 @@ Sentence is matched AND compiled, even if it has no arguments.
 Sentences matched when defined dynamically.
 
 Sentences are matched regardless of whitespace:
-	"The property    of Something."
+  "The property    of Something."
 Sentences are matched by pattern AND data-type.
 Sentences are matched by pattern AND data-type WHEN using partial sentences( "prop" of "noun")
 

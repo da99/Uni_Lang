@@ -6,8 +6,8 @@ class Code_Array_To_Lines
 
   def parse code_block
 
-		lines = code_block.lines
-		
+    lines = code_block.lines
+    
     new_lines  = []
     
     raise "Empty code block." if lines.empty? && !code_block.core
