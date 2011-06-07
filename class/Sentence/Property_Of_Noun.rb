@@ -4,18 +4,20 @@ class Uni_Lang
     
     Property_Of_Noun = Noun.new { |n|
 
+			n.parent = ::Uni_Lang::Core::Core
       n.name = 'property-of-noun'
       n.ancestors << 'Sentence'
       n.importable = true
+			
       n.create_property { |prop| 
         prop.name = 'pattern'
         prop.value = "the [Word Prop] of [Noun]"
         prop.updateable = false
       }
       
-      n.on('compile') { |ev|
+      n.create_event('compile') { |e|
     
-        line      = ev.arguments['line']
+        line      = e.args.line
         # Find property.
         # Raise if not found.
         prop_name = line.args['Prop'].value

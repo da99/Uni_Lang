@@ -55,13 +55,15 @@ class Code_Block
         @nouns << core_code_block
         @parsers << core_code_block
       end
-      end
       
     end
   
     def sentences
       nouns.select { |n|
-        n.ancestors.include?('Sentence')
+				# Is it a noun?
+				(n.respond_to?(:ancestors) && n.ancestors.include?('Sentence') ) || 
+					# Is it a code block or page?
+					n.respond_to?(:code_block) || n.respond_to?(:sentences)
       }
     end
   
@@ -88,14 +90,19 @@ class Code_Block
     end
 
     def match_line_to_sentences_and_compile line
-      
+					
       sentences.each { |scope|
-        
-        if scope.respond_to?(:new)
-          
-          sentence = scope.new
-          sentence.match_line_and_compile( line )
-          sentence if sentence.matched
+				
+        if scope.is_a?(Noun)
+      
+					
+					require 'rubygems'; require 'ruby-debug'; debugger
+					
+					
+					sentence = scope
+          sentence.events.run('match line and compile') { |r|
+						r.args.line = line
+					}
             
         elsif scope.respond_to?(:match_line_to_sentences_and_compile)
           
@@ -159,7 +166,7 @@ class Code_Block
 
         unless line.ignore
 
-          line.match_and_compile
+					match_line_to_sentences_and_compile(line)
 
           if line.partial_match?
             raise "Did not completely match: #{line.number}: #{line.code}"
@@ -182,7 +189,7 @@ class Code_Block
     
     def << obj
 
-      found = [ Noun, Sentence, Parser ].detect { |klass|
+      found = [ Noun, Parser ].detect { |klass|
         if klass == obj || 
           obj.class.included_modules.include?(klass.const_get(:Module)) ||
           ( obj.respond_to?(:included_modules) && obj.included_modules.include?(klass.const_get(:Module)) )
@@ -246,18 +253,6 @@ class Code_Block
       
       find_file
     end
-
-    # def top_env
-    #   current = self
-      # begin
-    #     
-    #     meth = [:parent, :code_block].detect { |meth_name|
-    #       current.respond_to? meth_name
-    #     }
-    #     
-    #     current.send meth
-    #   end  while next_parent.nil?
-    # end
     
     def core_code_block
       return nil if core

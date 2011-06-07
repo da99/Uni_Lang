@@ -4,8 +4,9 @@ class Uni_Lang
     
     Noun_Set_Property = Noun.new { |o|
       
+			o.parent = ::Uni_Lang::Core::Core
       o.name = 'noun-set-property'
-      o.ancestor << 'Sentence'
+      o.ancestors << 'Sentence'
       o.importable = true
       
       o.create_property { |prop|
@@ -14,8 +15,8 @@ class Uni_Lang
         prop.updateable = false
       }
       
-      o.on 'compile' do |ev|
-        line      = ev.arguments['line']
+      o.create_event 'compile' do |e|
+        line      = e.args.line
         prop      = line.args['Prop'].value
         val       = line.args['Val'].value
         noun_name = line.args['Noun'].value

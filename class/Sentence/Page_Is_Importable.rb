@@ -4,8 +4,9 @@ class Uni_Lang
     
     Page_Is_Importable = Noun.new { |o|
 
+			o.parent = ::Uni_Lang::Core::Core
       o.name = 'page-is-importable'
-      o.ancestor << 'Sentence'
+      o.ancestors << 'Sentence'
       o.importable = true
  
       o.create_property { |prop|
@@ -14,8 +15,8 @@ class Uni_Lang
         prop.updateable = false
       }
       
-      o.on('compile') { |ev|
-        line = ev.arguments['line']
+      o.create_event('compile') { |e|
+        line = e.args.line
         page = line.parent.parent
 
         raise "This line can only be used at top of page." unless page.is_a?(Page)

@@ -27,23 +27,12 @@ class Line
       if !@code
         raise "No text provided for line."
       end
+			
+			self.code_for_sentence_matcheing = self.code
       
       @number    = @index + 1
       
     end
-
-    def match_and_compile
-      return if ignore
-      return if not sentences.empty?
-      self.code_for_sentence_matcheing = self.code
-      parent.match_line_to_sentences_and_compile(self)
-      self.code_for_sentence_matcheing = nil
-    end
-
-    # def compile
-    #   return if ignore
-    #   sentences.last.compile self
-    # end
 
     def empty?
       code.strip.empty?

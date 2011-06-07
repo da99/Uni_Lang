@@ -6,8 +6,9 @@ class Uni_Lang
     
     Import_As = Noun.new { |o|
       
+			o.parent = ::Uni_Lang::Core::Core
       o.name = "import-as"
-      o.ancestor << 'Sentence'
+      o.ancestors << 'Sentence'
       o.importable = true
       
       o.create_property { |prop|
@@ -16,8 +17,8 @@ class Uni_Lang
         prop.updateable = false
       }
       
-      o.on('compile') do |e|
-        line    = e.arguments['line']
+      o.create_event('compile') do |run|
+        line    = run.line
         name    = line.args['Name'].value
         address = line.args['Address'].value
         line.parent.import address, name

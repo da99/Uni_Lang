@@ -19,11 +19,17 @@ require 'pp'
   Page 
   Parser 
   Code_Block
-  Sentence 
-  Noun 
-  Noun_Property
   Line 
   Argument
+
+  Noun 
+
+  Noun_Event
+  Noun_Event_Describe
+  Noun_Event_Run
+
+  Noun_Property
+  Noun/Sentence
   
 }.each { |name|
   require "class/#{name}"
@@ -118,9 +124,15 @@ This page is importable.
   ~
 }
 
-core = Code_Block.new { |o|
-  o.core = true
-}
+class Uni_Lang
+  module Core
+    Core = Code_Block.new { |o|
+      o.core = true
+    }
+  end
+end
+
+core = Uni_Lang::Core::Core
 
 # == Parsers
 %w{ 

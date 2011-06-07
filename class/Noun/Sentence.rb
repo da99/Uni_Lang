@@ -11,13 +11,20 @@ class Uni_Lang
     Sentence = Noun.new { |n|
       
       n.name = 'Sentence'
-      n.value = n
-      n.updateable = false
+			n.create_property { |prop|
+				prop.updateable = false
+				prop.name = 'value'
+				prop.value = n
+			}
       
+			n.describe_event('match line and compile') { |d|
+				d.require_args << 'line'
+			}
+
       # attr_accessor :full_match, :matched, :has_args
       # private :full_match=, :matched=, :has_args=
       
-      n.on('before create of self') do |e|
+      n.create_event('before create of self') do |e|
         n.create_property { |prop|
           prop.name = 'patterns'
           prop.value = []
@@ -25,15 +32,34 @@ class Uni_Lang
         }
       end
 
-      n.on('overwrite create of property named pattern') { |e|
+      n.create_event('overwrite create of property named pattern') { |e|
         
-        n.get_property_value('patterns') << Sentence_Pattern.new(n, e.arguments['pattern'])
+        n.propertys.read('patterns').value << Sentence_Pattern.new(n, e.arguments['pattern'])
 
       }
 
-      n.on('match line and compile') do |e| 
+      n.create_event('add arguments of pattern') do |r|
+        
+        type_and_name_array = r.args.arguments
 
-        line = e.arguments['line']
+        raise "Code has different arguments to: #{code}, #{other}"
+
+        self.has_args = !type_and_name_array.empty?
+        type_and_name_array.each { |pair|
+          type = pair[0]
+          label = pair[1] || type
+
+          if args.has_key?(label)
+            raise Author_Error, %~"#{label}" already used in: #{code}.~ 
+          end
+          args[label] = type
+          ordered << [label, type]
+        }
+      end
+			
+      n.create_event('match line and compile') do |r| 
+
+        line = r.args.line
         
         begin
           line.args.clear
@@ -86,25 +112,6 @@ class Uni_Lang
           end
         end while match && !self.full_match
 
-      end
-
-      n.on('add arguments of pattern') do |e|
-        
-        type_and_name_array = e.arguments['arguments']
-
-        raise "Code has different arguments to: #{code}, #{other}"
-
-        self.has_args = !type_and_name_array.empty?
-        type_and_name_array.each { |pair|
-          type = pair[0]
-          label = pair[1] || type
-
-          if args.has_key?(label)
-            raise Author_Error, %~"#{label}" already used in: #{code}.~ 
-          end
-          args[label] = type
-          ordered << [label, type]
-        }
       end
 
       
