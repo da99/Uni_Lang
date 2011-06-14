@@ -5,7 +5,7 @@ class Uni_Lang
     
     Noun_Create = Noun.new { |o|
       
-			o.parent = ::Uni_Lang::Core::Core
+      o.parent = ::Uni_Lang::Core::Core
       o.name = 'noun-create'
       o.ancestors << 'Sentence'
       o.importable = true

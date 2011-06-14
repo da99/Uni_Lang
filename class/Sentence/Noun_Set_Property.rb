@@ -4,7 +4,7 @@ class Uni_Lang
     
     Noun_Set_Property = Noun.new { |o|
       
-			o.parent = ::Uni_Lang::Core::Core
+      o.parent = ::Uni_Lang::Core::Core
       o.name = 'noun-set-property'
       o.ancestors << 'Sentence'
       o.importable = true
@@ -20,7 +20,7 @@ class Uni_Lang
         prop      = line.args['Prop'].value
         val       = line.args['Val'].value
         noun_name = line.args['Noun'].value
-        noun      = line.parent.detect_noun_named( noun_name )
+        noun      = line.parent.in_scope( 'noun named', noun_name )
 
         if !noun
           raise "Noun does not exist: #{noun_name}"

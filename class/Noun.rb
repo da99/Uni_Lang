@@ -4,31 +4,39 @@ class Noun
   
   module Module
 
-    attr_reader :propertys, :ancestors, :events
-    attr_accessor :name, :importable, :parent
+    attr_reader :name, :propertys, :events, :event_describes, :ancestor_nouns
+    attr_accessor :importable, :parent_code_block
 
-    def initialize 
-      @events = []
+    def initialize name = :default, *ancestors
+      @events          = []
       @event_describes = []
-      @ancestors  = []
-      @importable = false
-      @propertys  = {}
-      @name       = nil
-      @parent = nil
+      @ancestor_nouns  = ancestors
+      @importable      = false
+      @propertys       = {}
+      @name            = (name == :default) ? nil : name
+      @parent_code_block = nil 
+      
+      if ancestors.empty?
+        describe_event "create a property" do |d|
+          d.require_args << 'property'
+          d.require_args << 'name'
+          d.require_action = true
+        end
+      end
+
       yield(self)
       raise "Name is required." unless self.name
-      
-      describe_event("creation of a property named [word]") { |d|
-        d.before << "creation of any property"
-        d.require_args << 'property'
-        d.require_action = true
-      }
     end
-    
-    def ancestor_nouns
-      ancestors.map { |anc| 
-        parent.all('nouns', anc)
-      }
+
+    def create name, *ancestors, &blok
+      ancs = [self] + ancestors
+      Noun.new(name, *ancs, &blok)
+    end
+
+    def ancestor_line
+      ancestor_nouns.map { |n|
+        [n.ancestor_nouns, n]
+      }.flatten.uniq
     end
 
     def valid? str, program
@@ -43,20 +51,29 @@ class Noun
 
     # === Family Handling ================================
     
-    def all type, name  = :dont_filter
+    def in_scope type, name  = :dont_filter
+      name = nil if name == :dont_filter
+
       case type
-      when 'events'
-        list = if name == :dont_filter
-                 events + ancestor_nouns.map { |anc| anc.all(type) }
-               else
-                 events_named( name ) + ancestor_nouns.map { |anc| anc.all(type, name) }
-               end
+
+      when 'all events'
+        list = ancestor_line.map { |anc| anc.events } + events 
         list.flatten
+      
+      when 'events named'
+        list = ancestor_nouns.map { |anc| anc.in_scope(type, name) } + events_named( name )
+        list.flatten
+
       when 'event describes'
-        raise "Not implemented."
+        (ancestor_line.map(&:event_describes).flatten + event_describes).select { |desc| 
+          desc.matches?(name) 
+        }.flatten
+
       else
-        raise "Unknown type: #{type}"
+        raise "Unknown type: #{type}, name: #{name.inspect}"
+
       end
+      
     end
 
 
@@ -67,22 +84,22 @@ class Noun
     end
 
     def describe_event name, &blok
+      this = self
+      
       if block_given?
-        this = self
-
         @event_describes << ::Noun::Event::Describe.new(name) { |d|
-          d.parent = this
+          d.parent_noun = this
           d.instance_eval( &blok )
         }
       else
-        all     = @event_describes + parent.ancestor_nouns.map(&:describes)
-        targets = all.select { |desc| desc.name == name }
+        targets = in_scope('event describes', name)
 
         ::Noun::Event::Describe.new(name){ |d|
-          d.parent = this
+          d.parent_noun = this
           d.consume *targets
         }
       end
+      
     end
 
     def events_named target
@@ -100,21 +117,22 @@ class Noun
 
       this = self
       e_run = ::Noun::Event::Run.new(name) { |r|
-        r.parent = this
-        r.instance_eval { blok.call(r) }
+        r.parent_noun = this
+        blok.call(r)
       }
 
       result    = nil
-      methods   = named(name)
       overwrite = "overwrite #{name}"
       before    = "before #{name}"
       after     = "after #{name}"
 
-      ow_event = methods.detect { |m| m.name == overwrite }
-      b_events  = methods.select { |m| m.name == before }
-      a_events  = methods.select { |m| m.name == after }
+      methods   = in_scope('events named', name)
 
-      return ow_event.run( args ) if ow_event
+      ow_event  = in_scope('events named', overwrite).last
+      b_events  = in_scope('events named', before)
+      a_events  = in_scope('events named', after)
+
+      return( ow_event.run( name, &blok ) ) if ow_event
 
       b_events.each { |ev|
         ev.run args
@@ -137,14 +155,25 @@ class Noun
       name = new_prop.name
       raise "Property, #{name}, already created." if propertys.has_key?(name)
 
-      run_event("creation of a property named #{name}") { |r|
+      this = self
+      
+      run_event("create a property") { |r|
+        r.args.name = name
         r.args.property = new_prop 
         r.action = lambda  do |ir|
-          self[name] = new_prop
+          this.propertys[name] = new_prop
         end
       }
     end
     
+    def immutable_property name, val
+      create_property { |p|
+        p.name       = name
+        p.updateable = false
+        p.value      = val
+      }
+    end
+
     def property_named name
       raise "Property does not exist: #{name}" unless property_exists?(name)
       propertys[name] 

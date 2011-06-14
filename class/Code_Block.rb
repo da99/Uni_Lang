@@ -60,49 +60,68 @@ class Code_Block
   
     def sentences
       nouns.select { |n|
-				# Is it a noun?
-				(n.respond_to?(:ancestors) && n.ancestors.include?('Sentence') ) || 
-					# Is it a code block or page?
-					n.respond_to?(:code_block) || n.respond_to?(:sentences)
+        # Is it a noun?
+        (n.respond_to?(:ancestors) && n.ancestors.include?('Sentence') ) || 
+          # Is it a code block or page?
+          n.respond_to?(:code_block) || n.respond_to?(:sentences)
       }
-    end
-  
-    def detect_noun &blok
-      found = nil
-      nouns.each { |unknown|
-        
-        if unknown.respond_to?(:detect_noun)
-          unknown.detect_noun(&blok)
-        else
-          found = unknown if blok.call(unknown)
-        end
-        
-        break if found
-      }
-      
-      found
     end
     
-    def detect_noun_named noun_name
-      detect_noun  { |noun|
-        noun.name == noun_name
-      }
+    def in_scope type, *names, &blok
+      case type
+        
+      when 'nouns named'
+        nouns = in_scope('all nouns')
+        names.map { |name|
+          nouns.detect { |n| n.name == name }
+        }
+        
+      when 'noun named'
+        name = names.first
+        in_scope('all nouns')  { |noun|
+          noun.name == name
+        }.first
+        
+      when 'all nouns'
+        all_nouns = self.nouns.map { |unknown|
+
+          if unknown.is_a?(Noun)
+            unknown
+          else
+            if unknown.respond_to?(:in_scope)
+              unknown.in_scope(type, *names, &blok)
+            else
+              unknown.parent.in_scope(type, *names, &blok)
+            end
+          end
+
+        }.flatten
+        
+        if block_given?
+          all_nouns = all_nouns.select(&blok)
+        end
+
+        if names.empty?
+          all_nouns
+        else
+          names.map { |n| all_nouns.detect { |an| an.name == n.name } }
+        end
+        
+      else
+        raise "not done: in_scope #{type} #{names.inspect}"
+      end
     end
 
     def match_line_to_sentences_and_compile line
-					
+          
       sentences.each { |scope|
-				
+        
         if scope.is_a?(Noun)
       
-					
-					require 'rubygems'; require 'ruby-debug'; debugger
-					
-					
-					sentence = scope
+          sentence = scope
           sentence.events.run('match line and compile') { |r|
-						r.args.line = line
-					}
+            r.args.line = line
+          }
             
         elsif scope.respond_to?(:match_line_to_sentences_and_compile)
           
@@ -166,7 +185,7 @@ class Code_Block
 
         unless line.ignore
 
-					match_line_to_sentences_and_compile(line)
+          match_line_to_sentences_and_compile(line)
 
           if line.partial_match?
             raise "Did not completely match: #{line.number}: #{line.code}"

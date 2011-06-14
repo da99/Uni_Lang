@@ -8,18 +8,17 @@ class Uni_Lang
     Done_Line = "! Done :)"
     No_Match = Class.new(RuntimeError)
     
-    Sentence = Noun.new { |n|
+    Sentence = Noun.create('Sentence') { |n|
       
-      n.name = 'Sentence'
-			n.create_property { |prop|
-				prop.updateable = false
-				prop.name = 'value'
-				prop.value = n
-			}
+      n.create_property { |prop|
+        prop.updateable = false
+        prop.name = 'value'
+        prop.value = n
+      }
       
-			n.describe_event('match line and compile') { |d|
-				d.require_args << 'line'
-			}
+      n.describe_event('match line and compile') { |d|
+        d.require_args << 'line'
+      }
 
       # attr_accessor :full_match, :matched, :has_args
       # private :full_match=, :matched=, :has_args=
@@ -56,7 +55,7 @@ class Uni_Lang
           ordered << [label, type]
         }
       end
-			
+      
       n.create_event('match line and compile') do |r| 
 
         line = r.args.line

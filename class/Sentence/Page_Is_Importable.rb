@@ -4,7 +4,7 @@ class Uni_Lang
     
     Page_Is_Importable = Noun.new { |o|
 
-			o.parent = ::Uni_Lang::Core::Core
+      o.parent = ::Uni_Lang::Core::Core
       o.name = 'page-is-importable'
       o.ancestors << 'Sentence'
       o.importable = true

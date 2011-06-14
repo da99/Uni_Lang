@@ -4,11 +4,11 @@ class Uni_Lang
     
     Property_Of_Noun = Noun.new { |n|
 
-			n.parent = ::Uni_Lang::Core::Core
+      n.parent = ::Uni_Lang::Core::Core
       n.name = 'property-of-noun'
       n.ancestors << 'Sentence'
       n.importable = true
-			
+      
       n.create_property { |prop| 
         prop.name = 'pattern'
         prop.value = "the [Word Prop] of [Noun]"
@@ -22,7 +22,7 @@ class Uni_Lang
         # Raise if not found.
         prop_name = line.args['Prop'].value
         noun_name = line.args['Noun'].value
-        noun = line.parent.detect_noun_named(noun_name)
+        noun = line.parent.in_scope('noun_named', noun_name)
 
         if not noun
           raise "Noun not found: #{noun_name}"

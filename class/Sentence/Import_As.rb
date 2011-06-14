@@ -6,7 +6,7 @@ class Uni_Lang
     
     Import_As = Noun.new { |o|
       
-			o.parent = ::Uni_Lang::Core::Core
+      o.parent = ::Uni_Lang::Core::Core
       o.name = "import-as"
       o.ancestors << 'Sentence'
       o.importable = true

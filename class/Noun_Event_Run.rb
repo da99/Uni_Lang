@@ -1,27 +1,24 @@
 
 class Noun
-	class Event
-		class Run
-			
-			module Module
+  class Event
+    class Run
+      
+      module Module
         
-        attr_accessor :name, :parent, :action
+        attr_accessor :name, :parent_noun, :action
         attr_reader   :before, :after, :args, :describes
-				
-				def initialize name
+        
+        def initialize name
           @name   = name
-          @parent = nil
+          @parent_noun = nil
           @action = nil
           @before = []
           @after  = []
           yield(self)
-				end
+        end
         
         def describes
-          @describes ||= parent.all('event describes', name)
-          dgd.select { |desc|
-            desc.name_matches?(name)
-          }
+          @describes ||= parent_noun.in_scope('event describes', name)
         end
 
         def args
@@ -50,7 +47,7 @@ class Noun
           end
           
           before.each { |b|
-            parent.named(b).action.call(self)
+            parent_noun.named(b).action.call(self)
           }
           
           action.call(self)
@@ -61,10 +58,10 @@ class Noun
           
         end
 
-			end # === module
+      end # === module
 
-			include Module
+      include Module
 
-		end # === class Run
-	end # === class Event
+    end # === class Run
+  end # === class Event
 end # === class Noun

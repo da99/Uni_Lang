@@ -27,8 +27,8 @@ class Line
       if !@code
         raise "No text provided for line."
       end
-			
-			self.code_for_sentence_matcheing = self.code
+      
+      self.code_for_sentence_matcheing = self.code
       
       @number    = @index + 1
       
