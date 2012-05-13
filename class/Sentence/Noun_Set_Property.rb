@@ -2,11 +2,8 @@
 class Uni_Lang
   module Core
     
-    Noun_Set_Property = Noun.new { |o|
+    Noun_Set_Property = Sentence.create('Sentence-Set-Property') { |o|
       
-      o.parent = ::Uni_Lang::Core::Core
-      o.name = 'noun-set-property'
-      o.ancestors << 'Sentence'
       o.importable = true
       
       o.create_property { |prop|

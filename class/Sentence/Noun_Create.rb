@@ -3,11 +3,8 @@
 class Uni_Lang
   module Core
     
-    Noun_Create = Noun.new { |o|
+    Noun_Create = Sentence.create('Sentence-Noun-Create') { |o|
       
-      o.parent = ::Uni_Lang::Core::Core
-      o.name = 'noun-create'
-      o.ancestors << 'Sentence'
       o.importable = true
       
       o.create_property { |prop|

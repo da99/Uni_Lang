@@ -74,11 +74,11 @@ class Uni_Lang
 end # === class
 
 (nouns + sentences).each { |name|
-  Uni_Lang::Core::Core.run_event( 'insert noun', eval("Uni_Lang::Core::#{name}") )
+  Uni_Lang::Core::Core.run_event( 'insert noun', 'noun' => eval("Uni_Lang::Core::#{name}") )
 }
 
 parsers.each { |name|
-  Uni_Lang::Core::Core.run_event( 'insert parser', eval(name) ) 
+  Uni_Lang::Core::Core.run_event( 'insert parser', 'parser' => eval(name) ) 
 }
 
 

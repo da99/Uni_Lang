@@ -2,11 +2,8 @@
 class Uni_Lang
   module Core
     
-    Property_Of_Noun = Noun.new { |n|
+    Property_Of_Noun = Sentence.create('Sentence-Property-Of-Noun') { |n|
 
-      n.parent = ::Uni_Lang::Core::Core
-      n.name = 'property-of-noun'
-      n.ancestors << 'Sentence'
       n.importable = true
       
       n.create_property { |prop| 

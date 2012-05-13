@@ -4,11 +4,8 @@
 class Uni_Lang
   module Core
     
-    Import_As = Noun.new { |o|
+    Import_As = Sentence.create('Sentence-Import-As') { |o|
       
-      o.parent = ::Uni_Lang::Core::Core
-      o.name = "import-as"
-      o.ancestors << 'Sentence'
       o.importable = true
       
       o.create_property { |prop|

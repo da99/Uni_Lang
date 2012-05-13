@@ -2,9 +2,7 @@
 class Uni_Lang
   module Core
 
-    Code_Block_Alias = Noun.new { |n|
-      n.parent = ::Uni_Lang::Core::Core
-      n.name = 'Code Block Alias'
+    Code_Block_Alias = Noun.create('Code Block Alias') { |n|
     }
 
   end # === module

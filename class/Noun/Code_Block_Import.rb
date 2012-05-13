@@ -2,9 +2,7 @@
 class Uni_Lang
   module Core
 
-    Code_Block_Import = Noun.new { |n|
-      n.parent = ::Uni_Lang::Core::Core
-      n.name = 'Code Block Import'
+    Code_Block_Import = Noun.create('Code Block Import') { |n|
     }
 
   end # === module

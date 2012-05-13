@@ -49,34 +49,6 @@ class Noun
       "#{name} (#{self.class.name}) - #{propertys.map { |pair| pair.first.to_s + ': ' + pair.last.value.to_s }.join(', ') }"
     end
 
-    # === Family Handling ================================
-    
-    def in_scope type, name  = :dont_filter
-      name = nil if name == :dont_filter
-
-      case type
-
-      when 'all events'
-        list = ancestor_line.map { |anc| anc.events } + events 
-        list.flatten
-      
-      when 'events named'
-        list = ancestor_nouns.map { |anc| anc.in_scope(type, name) } + events_named( name )
-        list.flatten
-
-      when 'event describes'
-        (ancestor_line.map(&:event_describes).flatten + event_describes).select { |desc| 
-          desc.matches?(name) 
-        }.flatten
-
-      else
-        raise "Unknown type: #{type}, name: #{name.inspect}"
-
-      end
-      
-    end
-
-
     # === Events =========================================
     
     def create_event event_name, &blok
@@ -113,12 +85,12 @@ class Noun
       }
     end
 
-    def run_event name, &blok
+    def run_event name, args = {}, &blok
 
       this = self
-      e_run = ::Noun::Event::Run.new(name) { |r|
+      e_run = ::Noun::Event::Run.new(name, args) { |r|
         r.parent_noun = this
-        blok.call(r)
+        blok.call(r) if blok
       }
 
       result    = nil
@@ -126,10 +98,10 @@ class Noun
       before    = "before #{name}"
       after     = "after #{name}"
 
-      methods   = in_scope('events named', name)
+      methods   = run_event('in scope events named', 'name'=>name)
 
-      ow_event  = in_scope('events named', overwrite).last
-      b_events  = in_scope('events named', before)
+      ow_event  = run_event('in scope events named', 'name'=>overwrite).last
+      b_events  = run_event('in scope events named', 'name'=>before)
       a_events  = in_scope('events named', after)
 
       return( ow_event.run( name, &blok ) ) if ow_event

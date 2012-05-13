@@ -2,11 +2,8 @@
 class Uni_Lang
   module Core
     
-    Page_Is_Importable = Noun.new { |o|
+    Page_Is_Importable = Sentence.create('Sentence-Page-Is-Importable') { |o|
 
-      o.parent = ::Uni_Lang::Core::Core
-      o.name = 'page-is-importable'
-      o.ancestors << 'Sentence'
       o.importable = true
  
       o.create_property { |prop|

@@ -170,72 +170,81 @@ class Uni_Lang
         target.lines
       end
 
-    } # --- noun create
+      # -------------------------------------------
+      n.create_event('run') do |e|
 
-    def Code_Block.run
+        # === Parse code.
+        parse
 
-      # === Parse code.
-      parse
+        # === Execute lines.
+        index   = 0
+        this    = self
+        results = []
 
-      # === Execute lines.
-      index   = 0
-      this    = self
-      results = []
+        while index < @lines.size
 
-      while index < @lines.size
+          line  = @lines[index]
 
-        line  = @lines[index]
+          unless line.ignore
 
-        unless line.ignore
+            match_line_to_sentences_and_compile(line)
 
-          match_line_to_sentences_and_compile(line)
+            if line.partial_match?
+              raise "Did not completely match: #{line.number}: #{line.code}"
+            end
 
-          if line.partial_match?
-            raise "Did not completely match: #{line.number}: #{line.code}"
+            if not line.matched?
+              raise "Did not match: #{line.code}"
+            end
+
           end
 
-          if not line.matched?
-            raise "Did not match: #{line.code}"
-          end
+
+          index += line.skip
 
         end
 
-
-        index += line.skip
-
+        # scope.backtrace << "#{match.sentence.name}: #{match.args.inspect}\n#{line}\n#{sentence.code_block.code}"
       end
 
-      # scope.backtrace << "#{match.sentence.name}: #{match.args.inspect}\n#{line}\n#{sentence.code_block.code}"
-    end
+      
+      
+      # -------------------------------------------
+      n.create_event('import') do |e|
+        file_address = e.require('file_address')
+        name_alias   = e.require('name_alias')
+        
+        find_file = self.find_file
+        raise "Find file function not found." unless find_file
+        content     = find_file.call file_address, self
+        raise "File not found: #{file_address} (#{name_alias})" unless content
+        this        = self
 
-    def Code_Block.import file_address, name_alias
-      find_file = self.find_file
-      raise "Find file function not found." unless find_file
-      content     = find_file.call file_address, self
-      raise "File not found: #{file_address} (#{name_alias})" unless content
-      this        = self
+        new_page = Page.new { |o|
 
-      new_page = Page.new { |o|
+          o.file_address = file_address
+          o.name         = name_alias
+          o.parent       = this
+          o.code         = content
 
-        o.file_address = file_address
-        o.name         = name_alias
-        o.parent       = this
-        o.code         = content
+        }
 
-      }
+        new_page.code_block.run
+        raise "Not importable: #{file_address}" unless new_page.importable?
 
-      new_page.code_block.run
-      raise "Not importable: #{file_address}" unless new_page.importable?
+        sentences << new_page
+        nouns << new_page
+        imports << new_page
+        parsers << new_page
+        
+      end
 
-      sentences << new_page
-      nouns << new_page
-      imports << new_page
-      parsers << new_page
-    end
+      
+    } # --- noun create
 
   end # === module
+
 end # === class
 
 
-__END__
 
