@@ -44,9 +44,11 @@ The second-job of Rocket-Man is the real-job of Rocket-Man.
 
 
 
-puts PROGRAM
-puts ''
-puts ''
+print %~
+
+  #{PROGRAM}
+
+~
 
 require 'class/Noun/Core'
 prog = Uni_Lang::Core::Code_Block.create('my program') { |n|
@@ -223,7 +225,7 @@ program.code_block.find_file = lambda { |address, code_block|
 }
 program.code_block.run
 pp program.code_block.nouns.map(&:inspect_informally)
-puts program.backtrace.to_yaml
+print program.backtrace.to_yaml, "\n"
 
 
 module Askable
