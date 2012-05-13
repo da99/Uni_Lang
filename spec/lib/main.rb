@@ -1,8 +1,24 @@
 
-require File.expand_path('spec/helper')
-require 'Uni_Lang'
+require 'rubygems'
+require 'bundler'
+
+begin
+  Bundler.setup(:default, :development)
+rescue Bundler::BundlerError => e
+  $stderr.print e.message, "\n"
+  $stderr.print "Run `bundle install` to install missing gems\n"
+  exit e.status_code
+end
+
+require 'bacon'
 require 'Bacon_Colored'
 require 'pry'
+
+Bacon.summary_on_exit
+
+# ================= Custom code
+#
+require 'Uni_Lang'
 
 
 # ======== Include the tests.
