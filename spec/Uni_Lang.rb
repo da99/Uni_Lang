@@ -22,13 +22,7 @@ describe "Uni_Lang" do
 
 
 
-    print %~
-
-    #{PROGRAM}
-
-    ~
-
-    require 'class/Noun/Core'
+    require 'Uni_Lang/Noun/Core'
     prog = Uni_Lang::Core::Code_Block.create('my program') { |n|
 
       n.immutable_property('code', PROGRAM)

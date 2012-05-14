@@ -16,7 +16,7 @@ classes = %w{
 }
 
 classes.each { |name|
-  require "class/#{name}"
+  require "Uni_Lang/#{name}"
 }
 
 
@@ -30,7 +30,7 @@ parsers = %w{
 }
 
 parsers.each { |name|
-  require "class/Parser/#{name}"
+  require "Uni_Lang/Parser/#{name}"
 }
 
 
@@ -45,7 +45,7 @@ nouns = %w{
 }
 
 nouns.each { |name|
-  require "class/Noun/#{name}"
+  require "Uni_Lang/Noun/#{name}"
 }
 
 
@@ -58,7 +58,7 @@ sentences = %w{
   Page_Is_Importable
 }
 sentences.each { |name|
-  require "class/Sentence/#{name}"
+  require "Uni_Lang/Sentence/#{name}"
 }
 
 class Uni_Lang

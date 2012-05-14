@@ -1,6 +1,6 @@
 
 
-require "class/Not_In_Pattern"
+require "Uni_Lang/Not_In_Pattern"
 
 class Uni_Lang
   module Core
