@@ -25,5 +25,6 @@ Gem::Specification.new do |s|
   
   # s.rubyforge_project = "Uni_Lang"
   # specify any dependencies here; for example:
-  # s.add_runtime_dependency "rest-client"
+  s.add_runtime_dependency "Split_Lines"
+  s.add_runtime_dependency "indentation"
 end

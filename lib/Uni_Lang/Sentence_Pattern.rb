@@ -39,8 +39,12 @@ class Sentence_Pattern
       
       # Escape any text that is not an argument.
       # => "text\ is\ escaped\ while\ ARGS\ are\ not"
-      arg_wrappers = Not_In_Pattern.new(code).gsub(arg_pattern) { |piece|
-        Regexp.escape(piece)
+      arg_wrappers = (code).split(%r!(#{arg_pattern})!).map { |piece|
+        if piece =~ arg_pattern
+          Regexp.escape(piece)
+        else
+          piece
+        end
       } 
 
       self.pattern                = arg_wrappers.gsub(arg_pattern, '(' + word + ')')
