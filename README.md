@@ -36,7 +36,7 @@ an extension of how they think.
 That is why it looks like a toy: It's meant to be a better HyperTalk, not Smalltalk/Factor.
 In other words, it's for people who do not want to program.
 
-If you are a manly man or a womanly woman or wants a more powerful alternative, then use
+If you want more power: 
 [Smalltalk](http://www.squeak.org/) or [Factor](http://www.factorcode.org/).
 
 
