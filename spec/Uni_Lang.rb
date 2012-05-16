@@ -2,6 +2,15 @@
 describe "Uni_Lang" do
   
 
+  it "saves values to stack" do
+    u = Uni_Lang.new(%~
+      Val is 1
+      Val + 5
+    ~)
+    u.run
+    u.stack.should == ["1", 6.0]
+  end
+
   it "runs" do
     PROGRAM  = %~
 
@@ -22,7 +31,7 @@ describe "Uni_Lang" do
 
     u =  Uni_Lang.new(PROGRAM) 
     u.run
-    u.tree.should == ["Super"]
+    u.stack.should == ["Super"]
 
   end
 

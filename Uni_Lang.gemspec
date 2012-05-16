@@ -27,4 +27,5 @@ Gem::Specification.new do |s|
   # specify any dependencies here; for example:
   s.add_runtime_dependency "Split_Lines"
   s.add_runtime_dependency "indentation"
+  s.add_runtime_dependency "Walt"
 end
