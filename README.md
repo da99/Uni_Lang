@@ -6,6 +6,17 @@ Uni\_Lang
 
 A gem that provides the first implementation of The Universal Language.
 
+What is The Universal Language?
+-------------------------------
+
+It's not a language.  I don't know what to call
+it. However, people love hype over substance/reality. So, as a slave to
+the consumer, I use "Universal Language" as the name.  It's suppose to be
+more Englishy than HyperTalk, but with an implementation that is simple, ghetto,
+and fits in less than 1,000 lines of code. The Factor language (not the platform)
+by Slava Pestov opened my mind to the possibility of creating a flexible and powerful
+DSL with an easy-to-understand implementation design.  (Apologies to Mr. Pestov
+for using his beautiful language and platform to create a ghetto alternative.)
 
 Usage:
 -----
