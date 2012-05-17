@@ -55,7 +55,7 @@ Uses the [Walt](https://github.com/da99/Walt):
 
       Content goes here.
 
-### Core Functionality Implementation in Native Language
+### Core Functionality Implementation in Native Language:
 
 One of the harder problems to solve was figuring out the core functionality
 that will serve as the building blocks
@@ -65,7 +65,7 @@ to implement anything using a long block of memory.
 Arrays, Hashes, Strings, Classes, etc... They are all there to automate finding 
 and storing stuff in a block of memory.
 
-### Implementation of Classes
+### Implementation of Classes:
 
 A KVI data structure for implementation of prototype-based classes:
 
@@ -74,11 +74,11 @@ A KVI data structure for implementation of prototype-based classes:
       'class ancestors' : { 'Web-Page-Element', 'Display-As-Block' }
     }
 
-### Scope
+### Scope:
 
 Each scope has a `stack` as a KVI. 
 
-### Content and Logic Integration
+### Content and Logic Integration:
 
     New default column named, "First".
     Default link *!von to: http://www.mises.org/.
@@ -102,7 +102,17 @@ Each scope has a `stack` as a KVI.
 
         I read *!von and *!LRC.
 
-### Defining a Procedure
+The use of a `values` and `objects` is what makes the above concise and non-repetitive.
+In order to avoid the constant use of `dup` and `dip`, I use
+implied functions to search for values on the `stack` and `dup` it:
+
+    Add to styles: links.
+    Print last of Stack.
+
+The 1st line alters last item in the `objects` stack.
+The 2nd line uses the last item in the `values` stack.
+
+### Defining a Procedure:
 
 This is simpler for the masses to understand than to confuse them
 with terms like `method` and `function`.
@@ -115,6 +125,41 @@ with terms like `method` and `function`.
 
       2 + first Args
 
+### Matching against non-String, non-Num values:
+
+The last major problem was matching procedures to lines
+containing objects more complex than Strings or Nums:
+
+    Add old-list to new-list.
+    Name it: new-list.
+
+Here, `old-list` and `new-list` are lists of numbers
+that will be added together. The new list will be placed 
+on the `values` and `objects` stack.
+
+    [ 1 , 2 , 3 ]
+    [ 4 , 5 , 6 ]
+
+The procedure has a pattern: 
+
+    Add [WORD] to [WORD]
+
+The pattern is processed into two values: a **regexp** and an **array**.
+
+    1: %r!Add (...) to (...)!
+    2: [ [ "Add", "to" ], 2 ]
+
+The line is matched to the first **regexp**. If that does not work, then
+it is matched to the **array**.
+
+    Add old-list to new-list.
+    --> %r!Add (...) to (...)!
+    --> [['Add', 'to'], [obj, obj].size ]
+
+Type checking is done within the procedure:
+
+    Pass if first Arg has non-num keys.
+    Pass if second Arg has non-num keys.
 
 Commercial Break:
 -----------------
@@ -129,7 +174,7 @@ Ending Credits:
 --------------
 
 *Written, Produced, and Directed* <br />
-by pacing around and yelling at the World.
+by reading, pacing around, and thinking.
 
 
 The End
