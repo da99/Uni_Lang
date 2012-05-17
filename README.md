@@ -139,8 +139,9 @@ on the `values` and `objects` stack.
 
     [ 1 , 2 , 3 ]
     [ 4 , 5 , 6 ]
+    # ---> [ 1, ..., 6 ]
 
-The procedure has a pattern: 
+The procedure used has a pattern: 
 
     Add [WORD] to [WORD]
 
@@ -153,8 +154,8 @@ The line is matched to the first **regexp**. If that does not work, then
 it is matched to the **array**.
 
     Add old-list to new-list.
-    --> %r!Add (...) to (...)!
-    --> [['Add', 'to'], [obj, obj].size ]
+    --> match regexp: %r!Add (...) to (...)!
+    --> match array:  [['Add', 'to'], [obj, obj].size ]
 
 Type checking is done within the procedure:
 
