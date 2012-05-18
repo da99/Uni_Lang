@@ -171,11 +171,7 @@ None. Instead, it's the `stack` with simple instructions:
     Change every "." to "!".
     Remove first "!".
     Remove text starting with " H" and ending with "?".
-    Print last in Objects.
-
-The above would print:
-
-    "Hello World!"
+    Print last of Objects.
 
 Is the code too verbose? Well, don't blame me. That's how
 people like it. Not my fault you are part of the Genius Minority.
@@ -199,4 +195,4 @@ by reading, pacing around, and thinking.
 The End
 -------
 
-....?
+...?
