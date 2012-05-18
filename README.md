@@ -20,9 +20,14 @@ by Slava Pestov proved to me that simplicity and power is not only possible,
 but the only way to design anything.  (Apologies to Mr. Pestov
 for using his beautiful ideas as inspiration for a ghetto abomination.)
 
+It's the way most people want programming to be:
+an extension of how they think.
+That is why it looks like a toy: It's meant to be a better HyperTalk, not Smalltalk/Factor.
+In other words, it's for people who do not want to program.
+
 If you want more power: 
 [Smalltalk](http://www.squeak.org/) or [Factor](http://www.factorcode.org/).
-
+(Or just use HyperCard when Apple brings it back from purgatory.)
 
 Usage:
 -----
@@ -38,11 +43,6 @@ Usage:
   
 Implementation:
 ---------------
-
-The rest of the design is based on the way most people want programming to be:
-an extension of how they think.
-That is why it looks like a toy: It's meant to be a better HyperTalk, not Smalltalk/Factor.
-In other words, it's for people who do not want to program.
 
 ### Parsing:
 
@@ -162,6 +162,24 @@ Type checking is done within the procedure:
     Pass if first Arg has non-num keys.
     Pass if second Arg has non-num keys.
 
+### Regular Expressions:
+
+None. Instead, it's the `stack` with simple instructions:
+
+    My text: "Hello. World. How's it hanging?"
+    Change every "W" to "w".
+    Change every "." to "!".
+    Remove first "!".
+    Remove text starting with " H" and ending with "?".
+    Print last in Objects.
+
+The above would print:
+
+    "Hello World!"
+
+Is the code too verbose? Well, don't blame me. That's how
+people like it. Not my fault you are part of the Genius Minority.
+    
 Commercial Break:
 -----------------
 
