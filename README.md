@@ -6,6 +6,39 @@ Uni\_Lang
 
 A gem that provides the first implementation of The Universal Language.
 
+What apps should you create?
+----------------------------
+
+The WWW is a set of mediocre technologies on top of the Internet that
+prevent you from creating quality apps.
+Uni\_Lang does not try to overcome the limitations and mediocrity of the WWW/browser.
+Instead, it works within those limits and makes it as easy as possible to create
+web apps.
+
+The following are not going to be easy to make with Uni\_Lang:
+
+* web apps that try to pretend they are desktop apps.  
+* Flash apps
+* LivelyKernel apps
+
+However, if you stick to apps with the following qualities, you should have fun 
+and be productive:
+
+* text and layout
+* database
+* late-80s game console graphics (due to browser limitation).
+
+To create popular apps, combine the above with any of the following features:
+
+* low-latency feedback
+* interaction with a human being
+* graphics and layout from people with talent
+* scarcity and reward (the basis of competition)
+
+If you want to truly combine the Internet with desktop apps, look into Squeak, Pharos,
+or Factor (by Slava Pestov).  Use LivelyKernel, Tweak, or Morphic for ideas on creating a new UI 
+system.
+
 What is The Universal Language?
 -------------------------------
 
@@ -196,3 +229,4 @@ The End
 -------
 
 ...?
+
