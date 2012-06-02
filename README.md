@@ -62,6 +62,9 @@ If you want more power:
 [Smalltalk](http://www.squeak.org/) or [Factor](http://www.factorcode.org/).
 (Or just use HyperCard when Apple brings it back from purgatory.)
 
+If you want to learn to program, learn C or Forth. If you want to avoid
+programming and just make interactive web sites, use Uni\_Lang.
+
 Usage:
 -----
 
