@@ -59,10 +59,11 @@ That is why it looks like a toy: It's meant to be a better HyperTalk, not Smallt
 In other words, it's for people who do not want to program.
 
 If you want more power: 
-[Smalltalk](http://www.squeak.org/) or [Factor](http://www.factorcode.org/).
-(Or just use HyperCard when Apple brings it back from purgatory.)
+* [Pharo](http://www.pharo-project.org/) 
+* [Factor](http://www.factorcode.org/).
 
-If you want to learn to program, learn C or Forth. If you want to avoid
+If you want to learn to program, [learn C](http://learncodethehardway.org/) 
+AND [Forth](http://www.forth.com/starting-forth/). If you want to avoid
 programming and just make interactive web sites, use Uni\_Lang.
 
 Usage:
